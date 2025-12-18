@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT REPORT | MUSCLEMAX PRO AI</title>
+    <!-- フォント読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* * PROJECT PAGE STYLESHEET
+         * Theme: Cyberpunk / Military Terminal
+         */
+
+        :root {
+            --bg-color: #050508;
+            --panel-bg: rgba(10, 10, 20, 0.85);
+            --main-text: #a0a0c0;
+            --accent-pink: #ff40b0;
+            --accent-purple: #8a2be2;
+            --terminal-green: #00ff41;
+            --grid-line: rgba(138, 43, 226, 0.15);
+            --alert-red: #ff3333;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--main-text);
+            font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 走査線エフェクト */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ヘッダー */
+        header {
+            border-bottom: 1px solid var(--accent-purple);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            color: #fff;
+            margin: 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px var(--accent-purple);
+            letter-spacing: 2px;
+        }
+
+        .breadcrumb {
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        /* コンテンツパネル */
+        .content-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            clip-path: polygon(
+                20px 0, 100% 0, 
+                100% calc(100% - 20px), calc(100% - 20px) 100%, 
+                0 100%, 0 20px
+            );
+        }
+
+        .content-panel h2 {
+            color: var(--accent-pink);
+            border-left: 4px solid var(--accent-pink);
+            padding-left: 15px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .content-panel h2:first-child { margin-top: 0; }
+
+        .content-panel p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        /* 使用技術タグ */
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            padding: 5px 12px;
+            font-size: 0.85rem;
+            font-family: 'Share Tech Mono';
+            text-transform: uppercase;
+        }
+
+        /* ----- MOCK UI STYLES ----- */
+        .mock-container {
+            background: #0f1015;
+            border: 1px solid #333;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+        }
+
+        .mock-ui-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .mock-ui-grid { grid-template-columns: 1fr; }
+        }
+
+        .mock-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .mock-label {
+            display: block;
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .mock-input, .mock-select {
+            width: 100%;
+            background: #1a1b26;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            font-family: inherit;
+            border-radius: 4px;
+        }
+
+        .mock-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .mock-checkbox-label {
+            display: flex;
+            align-items: center;
+            background: #1a1b26;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mock-checkbox-label.checked {
+            border-color: var(--accent-purple);
+            background: rgba(138, 43, 226, 0.2);
+            color: #fff;
+        }
+
+        .mock-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-purple), #6a0dad);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mock-btn:active { transform: scale(0.98); }
+
+        /* 結果表示エリア（コンソール風） */
+        .mock-result {
+            background: #000;
+            border: 1px solid var(--terminal-green);
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--terminal-green);
+            font-size: 0.85rem;
+            min-height: 150px;
+            display: none; /* 初期非表示 */
+            white-space: pre-wrap;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2) inset;
+        }
+
+        .typing-cursor::after {
+            content: "█";
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* 戻るボタン */
+        .back-btn {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid var(--accent-purple);
+            padding: 10px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            font-family: 'Share Tech Mono';
+        }
+
+        .back-btn:hover {
+            background: var(--accent-pink);
+            color: #000;
+            box-shadow: 0 0 15px var(--accent-pink);
+        }
+
+        footer {
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.8rem;
+            margin-top: 60px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header>
+            <div>
+                <div class="breadcrumb">> ROOT / APPS / REPORT_02</div>
+                <h1>MUSCLEMAX PRO AI</h1>
+            </div>
+            <div style="font-family: 'Share Tech Mono'; color: var(--accent-purple); text-align: right;">
+                <div>STATUS: ACTIVE</div>
+                <div>VER: 2.5.0</div>
+            </div>
+        </header>
+
+        <main class="content-panel">
+            
+            <div class="tech-stack">
+                <span class="tag">Google Apps Script</span>
+                <span class="tag">Gemini API (2.5 Flash Lite)</span>
+                <span class="tag">Chart.js</span>
+                <span class="tag">Tailwind CSS</span>
+                <span class="tag">Google Sheets</span>
+            </div>
+
+            <h2>PROJECT OVERVIEW</h2>
+            <p>
+                <strong>MuscleMax Pro AI</strong> は、トレーニングの記録管理と、AIによるパーソナライズされたメニュー作成を統合したWebアプリケーションです。
+                Googleスプレッドシートをバックエンドデータベースとして使用し、サーバーレスで動作します。
+                ユーザーの過去の履歴データと、当日のコンディション・要望をGemini AIが解析し、その瞬間に最適なワークアウトメニューを提案します。
+            </p>
+
+            <h2>INTERACTIVE MOCK DEMO</h2>
+            <p>
+                実際のアプリに搭載されている「AIメニュー生成機能」の動作シミュレーションです。<br>
+                以下のパネルを操作して、AIトレーナーの挙動を確認できます。
+            </p>
+
+            <!-- モックUIエリア -->
+            <div class="mock-container">
+                <div class="mock-header">
+                    <span><i class="fas fa-robot"></i> AI TRAINER INTERFACE</span>
+                    <span style="color: var(--accent-pink);">● LIVE SIMULATION</span>
+                </div>
+
+                <div class="mock-ui-grid">
+                    <div>
+                        <div class="mock-input-group">
+                            <label class="mock-label">TRAINING TIME (MIN)</label>
+                            <input type="range" class="mock-input" min="30" max="120" value="60" oninput="document.getElementById('time-val').innerText = this.value + ' min'">
+                            <div style="text-align: right; color: var(--accent-purple); font-size: 0.8rem;" id="time-val">60 min</div>
+                        </div>
+
+                        <div class="mock-input-group">
+                            <label class="mock-label">TARGET MUSCLES</label>
+                            <div class="mock-checkbox-group">
+                                <div class="mock-checkbox-label" onclick="toggleCheck(this, 'Chest')">Chest</div>
+                                <div class="mock-checkbox-label" onclick="toggleCheck(this, 'Back')">Back</div>
+                                <div class="mock-checkbox-label" onclick="toggleCheck(this, 'Legs')">Legs</div>
+                                <div class="mock-checkbox-label" onclick="toggleCheck(this, 'Shoulders')">Shoulders</div>
+                                <div class="mock-checkbox-label" onclick="toggleCheck(this, 'Arms')">Arms</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="mock-input-group">
+                            <label class="mock-label">FREE COMMENT / REQUEST</label>
+                            <textarea id="mock-request" class="mock-input" rows="3" placeholder="例: ベンチプレス台が空いていないので、ダンベル中心でお願いします。"></textarea>
+                        </div>
+                        <div class="mock-input-group">
+                             <label class="mock-label">USER PROFILE (Mock)</label>
+                             <div style="font-size: 0.8rem; color: #666;">Height: 175cm / Weight: 70kg / Equipment: Full Gym</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="mock-btn" onclick="runMockAI()">GENERATE MENU <i class="fas fa-bolt"></i></button>
+
+                <!-- 結果表示用コンソール -->
+                <div id="mock-console" class="mock-result">
+                    <span class="typing-cursor">_</span>
+                </div>
+            </div>
+
+            <h2>KEY FEATURES</h2>
+            <p>
+                <strong>1. Gemini 2.5 Flash Lite 搭載</strong><br>
+                高速かつ高精度なLLMを使用。ユーザーの身長・体重情報に加え、「マシンが混んでいる」「今日は腰が痛い」といった自然言語でのリクエストを理解し、メニューを動的に調整します。
+            </p>
+            <p>
+                <strong>2. インテリジェント履歴管理</strong><br>
+                過去の重量・回数・1RM（最大挙上重量）を自動計算して記録。次回同じ種目を行う際には、前回の記録を参照して「推奨重量」を自動提示します。
+            </p>
+            <p>
+                <strong>3. 完全レスポンシブ & PWAライク</strong><br>
+                ジムでのスマホ操作に特化したUI設計。片手での数値入力、ワンタップでのセット記録、インターバルタイマーの自動連動など、トレーニングの流れを止めないUXを実現しました。
+            </p>
+
+            <h2>DEVELOPMENT NOTE</h2>
+            <p>
+                Google Apps Script (GAS) の <code>doGet</code> 関数を用いてHTMLを配信するSPA（Single Page Application）構成です。
+                データベースにはスプレッドシートを使用しているため、ユーザーはデータの二次利用やバックアップが容易です。
+                苦労した点は、GAS特有の非同期通信（google.script.run）と、iOS Safariにおける日付パースの挙動差異への対応でした。
+            </p>
+
+        </main>
+
+        <div style="text-align: center;">
+            <a href="index.html" class="back-btn"><< BACK TO APP</a>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 MuscleMax Pro Dev Team. All systems nominal.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // モック用スクリプト
+        function toggleCheck(el, val) {
+            el.classList.toggle('checked');
+        }
+
+        function runMockAI() {
+            const consoleEl = document.getElementById('mock-console');
+            const btn = document.querySelector('.mock-btn');
+            const requestText = document.getElementById('mock-request').value;
+            
+            // ターゲット部位の取得
+            const targets = Array.from(document.querySelectorAll('.mock-checkbox-label.checked')).map(el => el.innerText);
+            
+            if (targets.length === 0) {
+                alert("ERROR: Target muscle not selected.");
+                return;
+            }
+
+            consoleEl.style.display = 'block';
+            consoleEl.innerHTML = '<span class="typing-cursor">CONNECTING TO GEMINI API...</span>';
+            btn.disabled = true;
+            btn.style.opacity = 0.7;
+            btn.innerText = "PROCESSING...";
+
+            // 擬似的な遅延とタイピング演出
+            setTimeout(() => {
+                consoleEl.innerHTML = `<span style="color:#fff">>> REQUEST RECEIVED.</span><br>Target: [${targets.join(', ')}]<br>Note: "${requestText || 'None'}"<br><br><span class="typing-cursor">ANALYZING...</span>`;
+                
+                setTimeout(() => {
+                    const resultText = generateMockResponse(targets, requestText);
+                    typeWriter(resultText, consoleEl, () => {
+                        btn.disabled = false;
+                        btn.style.opacity = 1;
+                        btn.innerHTML = 'GENERATE MENU <i class="fas fa-bolt"></i>';
+                    });
+                }, 1500);
+            }, 800);
+        }
+
+        function generateMockResponse(targets, note) {
+            // ダミーレスポンス生成ロジック
+            let menu = [];
+            
+            if (targets.includes('Chest')) {
+                menu.push(`[CHEST] Dumbbell Press: 20kg x 10reps x 3sets`);
+                if (!note.includes('ダンベル')) menu.push(`[CHEST] Machine Fly: 35kg x 12reps x 3sets`);
+            }
+            if (targets.includes('Back')) {
+                menu.push(`[BACK] Lat Pulldown: 45kg x 10reps x 3sets`);
+                menu.push(`[BACK] Seated Row: 40kg x 10reps x 3sets`);
+            }
+            if (targets.includes('Legs')) {
+                menu.push(`[LEGS] Leg Press: 120kg x 10reps x 3sets`);
+                menu.push(`[LEGS] Leg Extension: 40kg x 12reps x 3sets`);
+            }
+            
+            // Default fallback
+            if (menu.length === 0) {
+                menu.push(`[${targets[0]}] Standard Exercise A: 10reps x 3sets`);
+                menu.push(`[${targets[0]}] Standard Exercise B: 12reps x 3sets`);
+            }
+
+            return `>> MENU GENERATED SUCCESSFULLY.\n\n` + menu.join('\n') + `\n\n>> ADVICE:\nフォームを崩さない重量設定を心がけてください。${note ? 'ご要望の条件を優先しました。' : ''}`;
+        }
+
+        function typeWriter(text, element, callback) {
+            element.innerHTML = "";
+            let i = 0;
+            const speed = 10; // 打鍵速度
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    // 自動スクロール
+                    element.scrollTop = element.scrollHeight;
+                    setTimeout(type, speed);
+                } else {
+                    element.innerHTML += '<span class="typing-cursor">_</span>'; // カーソル復活
+                    if (callback) callback();
+                }
+            }
+            type();
+        }
+    </script>
+
+</body>
+</html>
