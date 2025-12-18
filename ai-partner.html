@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT REPORT | AI STREAMING PARTNER</title>
+    <!-- フォント読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* * PROJECT PAGE STYLESHEET
+         * Theme: Cyberpunk / Military Terminal
+         */
+
+        :root {
+            --bg-color: #050508;
+            --panel-bg: rgba(10, 10, 20, 0.85);
+            --main-text: #a0a0c0;
+            --accent-pink: #ff40b0;
+            --accent-purple: #8a2be2;
+            --terminal-green: #00ff41;
+            --alert-red: #ff3333;
+            --grid-line: rgba(138, 43, 226, 0.15);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--main-text);
+            font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 走査線エフェクト */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ヘッダー簡易版 */
+        header {
+            border-bottom: 1px solid var(--accent-purple);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        h1 {
+            color: #fff;
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px var(--accent-purple);
+            line-height: 1.2;
+        }
+        
+        h1 span {
+            font-size: 1rem;
+            display: block;
+            color: var(--terminal-green);
+            letter-spacing: 2px;
+        }
+
+        .breadcrumb {
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        /* 記事コンテンツエリア */
+        .content-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            clip-path: polygon(
+                20px 0, 100% 0, 
+                100% calc(100% - 20px), calc(100% - 20px) 100%, 
+                0 100%, 0 20px
+            );
+        }
+
+        .content-panel h2 {
+            color: var(--accent-pink);
+            border-left: 4px solid var(--accent-pink);
+            padding-left: 15px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-family: 'Share Tech Mono';
+            letter-spacing: 1px;
+        }
+        .content-panel h2:first-child { margin-top: 0; }
+
+        .content-panel p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-family: 'Share Tech Mono';
+        }
+
+        /* --- MOCK UI STYLE (HTML/CSSでGUIを再現) --- */
+        .mock-container {
+            background: #1a1a2e;
+            border: 1px solid #4a4a6a;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            font-family: 'Meiryo UI', sans-serif;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .mock-title-bar {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 5px 10px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .mock-status {
+            text-align: center;
+            color: #2ecc71;
+            font-weight: bold;
+            margin: 15px 0;
+            font-size: 1.1em;
+            text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+        }
+
+        .mock-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            cursor: default; /* モックなのでカーソルは変えない */
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.2);
+        }
+
+        .mock-memory {
+            background: #2c3e50;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #f1c40f;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .mock-reset-btn {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 2px 8px;
+            font-size: 0.8em;
+        }
+
+        .mock-log {
+            background: #000;
+            color: #ccc;
+            height: 120px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8em;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        .mock-log-line { margin-bottom: 4px; }
+        .mock-user { color: #fff; }
+        .mock-ai { color: #ff79c6; }
+        .mock-sys { color: #8be9fd; }
+        /* ------------------------------------------- */
+
+        .back-btn {
+            display: inline-block;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid var(--accent-purple);
+            padding: 10px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            font-family: 'Share Tech Mono';
+        }
+
+        .back-btn:hover {
+            background: var(--accent-pink);
+            color: #000;
+            box-shadow: 0 0 15px var(--accent-pink);
+        }
+
+        footer {
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.8rem;
+            margin-top: 60px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header>
+            <div>
+                <div class="breadcrumb">> ROOT / EIMU'S LAB / REPORT</div>
+                <h1>AI STREAMING PARTNER<span>AI配信パートナーシステム</span></h1>
+            </div>
+            <div style="font-family: 'Share Tech Mono'; color: var(--accent-purple);">
+                ID: 02
+            </div>
+        </header>
+
+        <main class="content-panel">
+            
+            <!-- 使用技術タグ -->
+            <div class="tech-stack">
+                <span class="tag">Python</span>
+                <span class="tag">OpenAI API</span>
+                <span class="tag">RVC Integration</span>
+                <span class="tag">Tkinter GUI</span>
+                <span class="tag">OBS Studio</span>
+            </div>
+
+            <!-- 記事本文エリア -->
+            <h2>PROJECT OVERVIEW</h2>
+            <p>
+                配信者の発言をリアルタイムで聞き取り、AIキャラクター（妹系ギャル設定）が相槌や返答を行う配信補助ツール。
+                生成された音声は仮想オーディオケーブルを経由してRVC（ボイスチェンジャー）へ出力され、美少女ボイスによる自然な掛け合いを実現する。
+            </p>
+
+            <!-- GUIモックアップ -->
+            <div class="mock-container">
+                <div class="mock-title-bar">
+                    <span>AI配信パートナー操作盤</span>
+                    <span>_ □ X</span>
+                </div>
+                <div class="mock-status">ステータス: 聞き取り中...</div>
+                <button class="mock-btn">マイク ON (停止する)</button>
+                
+                <div class="mock-memory">
+                    <span>記憶: 3 / 10 往復</span>
+                    <button class="mock-reset-btn">記憶リセット</button>
+                </div>
+                
+                <button style="width:100%; background:#34495e; color:white; border:none; padding:5px; margin-bottom:10px;">⚙ 設定変更</button>
+
+                <div class="mock-log">
+                    <div class="mock-log-line mock-sys">=== AIシステム起動 ===</div>
+                    <div class="mock-log-line mock-sys">モデル: gpt-4o-mini</div>
+                    <div class="mock-log-line mock-sys">調整完了。準備OKです。</div>
+                    <div class="mock-log-line mock-user">あなた: 今日は何する？</div>
+                    <div class="mock-log-line mock-ai">AI(OpenAI): 雑談しよーよｗ</div>
+                </div>
+            </div>
+            <p style="text-align:center; font-size:0.8rem; color:var(--terminal-green);">▲ GUI INTERFACE MOCKUP</p>
+
+            <h2>KEY FEATURES</h2>
+            <p>
+                <strong>1. リアルタイム音声対話 & キャラクター再現</strong><br>
+                マイク入力を自動検知し、「思考」から「発話」までを全自動化。プロンプトエンジニアリングにより、20文字程度の短くテンポの良い「ギャル語」での返答を実現。
+            </p>
+            <p>
+                <strong>2. RVC & OBS 完全連携</strong><br>
+                AI音声を直接スピーカーから出さず、<code>CABLE-B Input</code>へルーティングすることでRVCによる声質変換に対応。さらに発言内容を<code>subtitle.txt</code>へリアルタイム出力し、OBS上での字幕表示も可能にした。
+            </p>
+            <p>
+                <strong>3. 文脈メモリ & 制御GUI</strong><br>
+                直近10往復の会話を保持するメモリ機能を搭載。話の流れを汲んだ返答が可能。GUIパネルからはマイクのON/OFFや記憶のリセット、APIキー設定などが即座に行える。
+            </p>
+
+            <h2>DEVELOPMENT NOTE</h2>
+            <p>
+                OpenAI TTSとRVCの連携における「遅延問題」が最大の課題だった。
+                これに対し、RVC側のバッファサイズ(Chunk)を極限まで小さくし、推定アルゴリズムを調整することで、AI音声特有のノイズ耐性を活かした低遅延設定を確立した。
+                また、Windowsバッチファイルによる環境構築の自動化（venv修復機能含む）も実装済み。
+            </p>
+
+        </main>
+
+        <div style="text-align: center;">
+            <a href="index.html" class="back-btn"><< RETURN TO COMMAND CENTER</a>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Hoshii Eimu. End of Report.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
