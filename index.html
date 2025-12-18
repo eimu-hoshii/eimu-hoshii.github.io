@@ -446,13 +446,13 @@
                    style="display:none" の代わりに、プレースホルダー要素を表示するJSを入れることも可能ですが、
                    ここではシンプルにaltを表示するか、画像があればそれを表示します。
                 -->
-                <img src="chara.jpg" alt="" class="chara-img" onerror="this.style.display='none'; document.getElementById('placeholder').style.display='flex'">
+                <img src="chara.png" alt="" class="chara-img" onerror="this.style.display='none'; document.getElementById('placeholder').style.display='flex'">
                 
                 <!-- 画像がない時に表示される箱 -->
                 <div id="placeholder" class="img-placeholder" style="display: none;">
                     <div style="font-size: 3rem;">⚠</div>
                     <p>NO SIGNAL</p>
-                    <p style="font-size: 0.8rem;">IMAGE NOT FOUND: chara.jpg</p>
+                    <p style="font-size: 0.8rem;">IMAGE NOT FOUND: chara.png</p>
                 </div>
             </div>
 
@@ -486,17 +486,28 @@
                 <div class="panel">
                     <h2>DEPLOYMENT <span class="deco">/// LINKS_02</span></h2>
                     <div class="link-grid">
-                        <a href="https://www.youtube.com/@YOUR_CHANNEL_ID" class="link-btn" target="_blank">
-                            YouTube <span class="btn-deco">[MAIN]</span>
-                        </a>
-                        <a href="https://twitter.com/YOUR_ID" class="link-btn" target="_blank">
-                            X (Twitter) <span class="btn-deco">[COMMS]</span>
+                        <!-- Main Platforms -->
+                        <a href="https://www.twitch.tv/YOUR_ID" class="link-btn" target="_blank">
+                            Twitch <span class="btn-deco">[MAIN BASE]</span>
                         </a>
                         <a href="https://www.tiktok.com/@YOUR_ID" class="link-btn" target="_blank">
                             TikTok <span class="btn-deco">[SHORT]</span>
                         </a>
-                        <a href="#" class="link-btn" target="_blank">
-                            Marshmallow <span class="btn-deco">[MSG]</span>
+
+                        <!-- Sub Platforms -->
+                        <a href="https://www.youtube.com/@YOUR_CHANNEL_ID" class="link-btn" target="_blank">
+                            YouTube <span class="btn-deco">[ARCHIVE]</span>
+                        </a>
+                        <a href="https://kick.com/YOUR_ID" class="link-btn" target="_blank">
+                            Kick <span class="btn-deco">[SUB OPS]</span>
+                        </a>
+                        
+                        <!-- Communication -->
+                        <a href="https://twitter.com/YOUR_ID" class="link-btn" target="_blank">
+                            X (Twitter) <span class="btn-deco">[COMMS]</span>
+                        </a>
+                        <a href="https://mond.how/YOUR_ID" class="link-btn" target="_blank">
+                            Mond <span class="btn-deco">[Q&A]</span>
                         </a>
                     </div>
                 </div>
