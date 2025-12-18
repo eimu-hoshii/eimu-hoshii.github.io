@@ -1,0 +1,206 @@
+/* COMMAND CENTER STYLESHEET
+  Theme: Cyberpunk / Military Terminal
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
+
+:root {
+    --bg-color: #050508;
+    --panel-bg: rgba(20, 20, 35, 0.7);
+    --main-text: #a0a0c0;
+    --accent-pink: #ff40b0; /* 詠夢ピンク */
+    --accent-purple: #8a2be2;
+    --terminal-green: #00ff41;
+    --grid-line: rgba(255, 64, 176, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 30px 30px; /* グリッド背景 */
+    color: var(--main-text);
+    font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', monospace;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* CRTモニター風の走査線エフェクト */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 999;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ヘッダー周り */
+header {
+    text-align: center;
+    padding: 40px 0 20px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 3rem;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0;
+    text-shadow: 
+        2px 2px 0px var(--accent-purple),
+        -2px -2px 0px var(--accent-pink);
+    animation: glitch 1s infinite alternate;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--accent-pink);
+    letter-spacing: 2px;
+}
+
+/* メインレイアウト */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .main-grid {
+        grid-template-columns: 1fr; /* スマホでは縦並び */
+    }
+    h1 {
+        font-size: 2rem;
+    }
+}
+
+/* 立ち絵エリア */
+.chara-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.chara-img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    filter: drop-shadow(0 0 15px rgba(255, 64, 176, 0.4));
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    transition: transform 0.3s ease;
+}
+
+.chara-img:hover {
+    transform: scale(1.02);
+}
+
+/* 情報パネル（ガラス風デザイン） */
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--accent-pink);
+    padding: 25px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+}
+
+.panel h2 {
+    color: #fff;
+    border-bottom: 1px solid var(--accent-purple);
+    padding-bottom: 10px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel h2::before {
+    content: ">>";
+    color: var(--accent-pink);
+    font-size: 0.8em;
+}
+
+/* リンクボタン */
+.link-list {
+    list-style: none;
+    padding: 0;
+}
+
+.link-btn {
+    display: block;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    margin: 10px 0;
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid var(--accent-purple);
+    transition: all 0.3s ease;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.link-btn:hover {
+    background: var(--accent-pink);
+    color: #000;
+    box-shadow: 0 0 15px var(--accent-pink);
+    transform: translateX(5px);
+}
+
+/* 点滅カーソル */
+.blinking-cursor::after {
+    content: "_";
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+/* フッター */
+footer {
+    text-align: center;
+    padding: 40px;
+    font-size: 0.8rem;
+    opacity: 0.6;
+    border-top: 1px solid #333;
+    margin-top: 40px;
+}
