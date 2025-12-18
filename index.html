@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v2.0
+        /* * COMMAND CENTER STYLESHEET v2.1
          * Theme: Cyberpunk / Military Terminal / Holographic
          */
 
@@ -212,12 +212,18 @@
             align-items: start;
         }
 
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
         @media (max-width: 900px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
             h1 { font-size: 2.5rem; }
-            .chara-section { order: -1; }
+            .left-column { order: -1; }
         }
 
         /* 立ち絵エリア（ホログラム風） */
@@ -347,6 +353,29 @@
             flex: 1;
         }
 
+        /* Twitch埋め込みスタイル */
+        .twitch-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border: 1px solid var(--accent-purple);
+            position: relative;
+        }
+        .twitch-container::after {
+            content: "LIVE_FEED_OFFLINE";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #333;
+            z-index: 0;
+        }
+        .twitch-iframe {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+
         /* リンクボタン */
         .link-grid {
             display: grid;
@@ -438,25 +467,44 @@
 
         <div class="main-grid">
             
-            <!-- 左側：立ち絵エリア -->
-            <div class="chara-section">
-                <div class="chara-bg-circle"></div>
-                <!-- 
-                   画像の読み込みに失敗した場合、onerrorでプレースホルダーを表示します。
-                   style="display:none" の代わりに、プレースホルダー要素を表示するJSを入れることも可能ですが、
-                   ここではシンプルにaltを表示するか、画像があればそれを表示します。
-                -->
-                <img src="chara.png" alt="" class="chara-img" onerror="this.style.display='none'; document.getElementById('placeholder').style.display='flex'">
-                
-                <!-- 画像がない時に表示される箱 -->
-                <div id="placeholder" class="img-placeholder" style="display: none;">
-                    <div style="font-size: 3rem;">⚠</div>
-                    <p>NO SIGNAL</p>
-                    <p style="font-size: 0.8rem;">IMAGE NOT FOUND: chara.png</p>
+            <!-- 左カラム：立ち絵 ＆ ライブフィード -->
+            <div class="left-column">
+                <div class="chara-section">
+                    <div class="chara-bg-circle"></div>
+                    <img src="chara.png" alt="" class="chara-img" onerror="this.style.display='none'; document.getElementById('placeholder').style.display='flex'">
+                    
+                    <div id="placeholder" class="img-placeholder" style="display: none;">
+                        <div style="font-size: 3rem;">⚠</div>
+                        <p>NO SIGNAL</p>
+                        <p style="font-size: 0.8rem;">IMAGE NOT FOUND: chara.png</p>
+                    </div>
+                </div>
+
+                <!-- Twitch Embed Panel -->
+                <div class="panel" style="margin-bottom: 0;">
+                    <h2>LIVE FEED <span class="deco">/// CAM_01</span></h2>
+                    <div class="twitch-container">
+                        <!-- 
+                           【重要】parentパラメータについて
+                           Twitchの埋め込みは、セキュリティ設定により「parent」で指定されたドメインでのみ機能します。
+                           ここでは GitHub Pages のドメイン (eimu-hoshii.github.io) を指定しています。
+                           このため、ローカルやプレビュー環境では表示されない場合がありますが、アップロードすれば動きます。
+                        -->
+                        <iframe
+                            class="twitch-iframe"
+                            src="https://player.twitch.tv/?channel=hoshiieimu&parent=eimu-hoshii.github.io"
+                            frameborder="0"
+                            allowfullscreen="true"
+                            scrolling="no">
+                        </iframe>
+                    </div>
+                    <div style="text-align: right; font-size: 0.8rem; color: var(--terminal-green); margin-top: 5px;">
+                        SIGNAL: STRONG
+                    </div>
                 </div>
             </div>
 
-            <!-- 右側：情報パネルエリア -->
+            <!-- 右カラム：情報パネルエリア -->
             <div class="info-section">
                 
                 <div id="clock-display">00:00:00</div>
@@ -487,26 +535,26 @@
                     <h2>DEPLOYMENT <span class="deco">/// LINKS_02</span></h2>
                     <div class="link-grid">
                         <!-- Main Platforms -->
-                        <a href="https://www.twitch.tv/YOUR_ID" class="link-btn" target="_blank">
+                        <a href="https://www.twitch.tv/hoshiieimu" class="link-btn" target="_blank">
                             Twitch <span class="btn-deco">[MAIN BASE]</span>
                         </a>
-                        <a href="https://www.tiktok.com/@YOUR_ID" class="link-btn" target="_blank">
+                        <a href="https://www.tiktok.com/@hoshii.eimu" class="link-btn" target="_blank">
                             TikTok <span class="btn-deco">[SHORT]</span>
                         </a>
 
                         <!-- Sub Platforms -->
-                        <a href="https://www.youtube.com/@YOUR_CHANNEL_ID" class="link-btn" target="_blank">
+                        <a href="https://www.youtube.com/@hoshiieimu" class="link-btn" target="_blank">
                             YouTube <span class="btn-deco">[ARCHIVE]</span>
                         </a>
-                        <a href="https://kick.com/YOUR_ID" class="link-btn" target="_blank">
+                        <a href="https://kick.com/hoshii-eimu" class="link-btn" target="_blank">
                             Kick <span class="btn-deco">[SUB OPS]</span>
                         </a>
                         
                         <!-- Communication -->
-                        <a href="https://twitter.com/YOUR_ID" class="link-btn" target="_blank">
+                        <a href="https://x.com/hoshii_eimu" class="link-btn" target="_blank">
                             X (Twitter) <span class="btn-deco">[COMMS]</span>
                         </a>
-                        <a href="https://mond.how/YOUR_ID" class="link-btn" target="_blank">
+                        <a href="https://mond.how/ja/hoshii_eimu" class="link-btn" target="_blank">
                             Mond <span class="btn-deco">[Q&A]</span>
                         </a>
                     </div>
