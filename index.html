@@ -10,8 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v2.1
+        /* * COMMAND CENTER STYLESHEET v2.3
          * Theme: Cyberpunk / Military Terminal / Holographic
+         * Update: Project List Styles
          */
 
         :root {
@@ -395,6 +396,7 @@
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .link-btn:hover {
@@ -418,6 +420,154 @@
             text-align: right;
             margin-bottom: 10px;
             text-shadow: 0 0 5px var(--accent-pink);
+        }
+
+        /* モーダルウィンドウ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            display: none; /* デフォルトは非表示 */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-window {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            background: var(--bg-color);
+            border: 1px solid var(--terminal-green);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-window {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--terminal-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            color: var(--terminal-green);
+            font-family: 'Share Tech Mono';
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Share Tech Mono';
+        }
+
+        .close-btn:hover {
+            background: var(--terminal-green);
+            color: #000;
+        }
+
+        .modal-content {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+            color: #ddd;
+        }
+
+        /* * Project List Styles 
+         * モーダル内のプロジェクト一覧用スタイル
+         */
+        .project-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .project-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--accent-purple);
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--terminal-green);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .project-item h4 {
+            margin: 0 0 5px 0;
+            color: var(--accent-pink);
+            font-family: 'Share Tech Mono';
+            font-size: 1.1rem;
+        }
+
+        .project-desc {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            flex-grow: 1; /* ボタンを下揃えにするため */
+        }
+
+        .tech-tag {
+            font-size: 0.7rem;
+            color: var(--terminal-green);
+            border: 1px solid var(--terminal-green);
+            padding: 2px 6px;
+            align-self: flex-start;
+            margin-bottom: 10px;
+            font-family: 'Share Tech Mono';
+            opacity: 0.8;
+        }
+
+        .launch-btn {
+            text-align: right;
+            color: #fff;
+            text-decoration: none;
+            font-family: 'Share Tech Mono';
+            font-size: 0.9rem;
+            margin-top: auto;
+            transition: color 0.2s;
+            display: inline-block;
+        }
+
+        .launch-btn:hover {
+            color: var(--terminal-green);
+            text-shadow: 0 0 8px var(--terminal-green);
         }
 
         footer {
@@ -484,12 +634,6 @@
                 <div class="panel" style="margin-bottom: 0;">
                     <h2>LIVE FEED <span class="deco">/// CAM_01</span></h2>
                     <div class="twitch-container">
-                        <!-- 
-                           【重要】parentパラメータについて
-                           Twitchの埋め込みは、セキュリティ設定により「parent」で指定されたドメインでのみ機能します。
-                           ここでは GitHub Pages のドメイン (eimu-hoshii.github.io) を指定しています。
-                           このため、ローカルやプレビュー環境では表示されない場合がありますが、アップロードすれば動きます。
-                        -->
                         <iframe
                             class="twitch-iframe"
                             src="https://player.twitch.tv/?channel=hoshiieimu&parent=eimu-hoshii.github.io"
@@ -564,7 +708,8 @@
                     <h2>EIMU'S LAB <span class="deco">/// DEV_LOG_03</span></h2>
                     <p>Gemini APIを活用した自作ツール開発記録</p>
                     <div class="link-list">
-                        <a href="#" class="link-btn" style="border-color: var(--terminal-green);">
+                        <!-- IDとOnClickイベントを追加 -->
+                        <a onclick="openModal('gemini-modal')" class="link-btn" style="border-color: var(--terminal-green);">
                             > Access Project GEMINI
                         </a>
                         <a href="#" class="link-btn" style="border-color: var(--terminal-green);">
@@ -581,6 +726,54 @@
             <p style="font-size: 0.7rem; color: #555;">SECURE CONNECTION ESTABLISHED. END OF LINE.</p>
         </footer>
 
+    </div>
+
+    <!-- Project GEMINI Modal -->
+    <div id="gemini-modal" class="modal-overlay">
+        <div class="modal-window">
+            <div class="modal-header">
+                <span class="modal-title">> PROJECT_GEMINI.exe</span>
+                <button class="close-btn" onclick="closeModal('gemini-modal')">X CLOSE</button>
+            </div>
+            <div class="modal-content">
+                <h3 class="text-green">> PROJECT_DATABASE: [LOADED]</h3>
+                <p>Gemini API Integration / Development Log</p>
+                <hr style="border-color: rgba(0,255,65,0.2); margin: 15px 0;">
+
+                <div class="project-list">
+                    <!-- Project 01 -->
+                    <div class="project-item">
+                        <span class="tech-tag">AI / LLM</span>
+                        <h4>AI STREAM PARTNER</h4>
+                        <p class="project-desc">AI配信パートナーシステム（AI会話ツール）。コメントにリアルタイムで反応する相棒AI。</p>
+                        <a href="#" class="launch-btn">>> EXECUTE_APP</a>
+                    </div>
+
+                    <!-- Project 02 -->
+                    <div class="project-item">
+                        <span class="tech-tag">HEALTH</span>
+                        <h4>MuscleMax</h4>
+                        <p class="project-desc">筋トレ管理ツール。トレーニング記録とAIによる最適メニュー提案。</p>
+                        <a href="#" class="launch-btn">>> EXECUTE_APP</a>
+                    </div>
+
+                    <!-- Project 03 -->
+                    <div class="project-item">
+                        <span class="tech-tag">AUTO / LOG</span>
+                        <h4>MOTOLOG</h4>
+                        <p class="project-desc">燃費・メンテナンス管理アプリ。愛車の状態を記録・分析。</p>
+                        <a href="#" class="launch-btn">>> EXECUTE_APP</a>
+                    </div>
+                </div>
+
+                <br>
+                <div style="background: rgba(0,0,0,0.5); padding: 15px; border: 1px solid #333; font-family: monospace; font-size: 0.85rem;">
+                    > STATUS: 3 PROJECTS DETECTED<br>
+                    > WAITING FOR NEXT COMMAND...<br>
+                    > _
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -608,6 +801,35 @@
         }
         setInterval(updateClock, 30); // 30msごとに更新
         updateClock();
+
+        // モーダル制御
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+            // 少し遅延させてopacityを変更することでアニメーションさせる
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            // アニメーションが終わってからdisplayをnoneにする
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // モーダルの外側をクリックしたら閉じる
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+                setTimeout(() => {
+                    event.target.style.display = 'none';
+                }, 300);
+            }
+        }
     </script>
 </body>
 </html>
