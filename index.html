@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v2.6
+        /* * COMMAND CENTER STYLESHEET v2.7
          * Theme: Cyberpunk / Military Terminal / Holographic
-         * Update: Reverted X Timeline (Layout Adjustment)
+         * Update: Twitch Embed Autoplay/Mute Settings
          */
 
         :root {
@@ -685,9 +685,14 @@
                 <div class="panel" style="margin-bottom: 0;">
                     <h2>LIVE FEED <span class="deco">/// CAM_01</span></h2>
                     <div class="twitch-container">
+                        <!-- 
+                            【UPDATE】自動再生対応
+                            &autoplay=true&muted=true を追加しました。
+                            これにより、サイトロード時に自動で再生が開始されます（音声はミュート状態）。
+                        -->
                         <iframe
                             class="twitch-iframe"
-                            src="https://player.twitch.tv/?channel=hoshiieimu&parent=eimu-hoshii.github.io"
+                            src="https://player.twitch.tv/?channel=hoshiieimu&parent=eimu-hoshii.github.io&autoplay=true&muted=true"
                             frameborder="0"
                             allowfullscreen="true"
                             scrolling="no">
