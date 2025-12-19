@@ -33,4 +33,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <!-- 使用機材ページ (NEW) -->
+  <url>
+    <loc>https://eimu-hoshii.github.io/gear.html</loc>
+    <lastmod>2025-12-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
