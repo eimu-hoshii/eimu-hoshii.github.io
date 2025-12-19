@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROJECT REPORT | MOTOLOG</title>
+    <title>MOTOLOG | PROJECT REPORT</title>
     <!-- フォント読み込み -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,7 @@
     <style>
         /* * PROJECT PAGE STYLESHEET
          * Theme: Cyberpunk / Military Terminal
+         * Note: index.htmlと共通のデザイン設定です
          */
 
         :root {
@@ -20,7 +21,6 @@
             --main-text: #a0a0c0;
             --accent-pink: #ff40b0;
             --accent-purple: #8a2be2;
-            --accent-cyan: #06b6d4; /* MOTOLOG Theme Color */
             --terminal-green: #00ff41;
             --grid-line: rgba(138, 43, 226, 0.15);
         }
@@ -53,7 +53,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 800px; /* 読みやすいように少し幅を狭く */
             margin: 0 auto;
             padding: 40px 20px;
             position: relative;
@@ -81,7 +81,6 @@
         .breadcrumb {
             color: var(--terminal-green);
             font-size: 0.9rem;
-            margin-bottom: 5px;
         }
 
         /* 記事コンテンツエリア */
@@ -93,6 +92,7 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
+            /* 角を切り落とす */
             clip-path: polygon(
                 20px 0, 100% 0, 
                 100% calc(100% - 20px), calc(100% - 20px) 100%, 
@@ -100,14 +100,19 @@
             );
         }
 
+        /* コンテンツ内のスタイル */
         .content-panel h2 {
-            color: var(--accent-cyan); /* Cyanに変更 */
-            border-left: 4px solid var(--accent-cyan);
+            color: var(--accent-pink);
+            border-left: 4px solid var(--accent-pink);
             padding-left: 15px;
-            margin-top: 50px;
+            margin-top: 40px;
             margin-bottom: 20px;
-            font-size: 1.4rem;
-            letter-spacing: 0.1em;
+        }
+        .content-panel h3 {
+            color: var(--terminal-green);
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-family: 'Share Tech Mono';
         }
         .content-panel h2:first-child { margin-top: 0; }
 
@@ -116,124 +121,55 @@
             margin-bottom: 20px;
         }
 
+        .content-panel img {
+            max-width: 100%;
+            border: 1px solid var(--accent-purple);
+            margin: 20px 0;
+            display: block;
+        }
+
         .tech-stack {
             display: flex;
-            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 30px;
         }
 
         .tag {
-            background: rgba(6, 182, 212, 0.1); /* Cyan bg */
-            border: 1px solid var(--accent-cyan);
-            color: var(--accent-cyan);
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--terminal-green);
+            color: var(--terminal-green);
             padding: 5px 10px;
             font-size: 0.8rem;
             font-family: 'Share Tech Mono';
         }
 
-        /* --- CSS MOCKUP SYSTEM --- */
-        .mockup-wrapper {
-            display: flex;
-            justify-content: center;
-            margin: 40px 0;
-            perspective: 1000px;
-        }
-
-        .phone-frame {
-            width: 280px;
-            height: 560px;
-            background: #0f172a; /* Slate 900 */
-            border-radius: 30px;
-            border: 8px solid #334155;
-            box-shadow: 
-                0 20px 50px rgba(0,0,0,0.8),
-                0 0 0 2px #1e293b,
-                inset 0 0 20px rgba(0,0,0,0.5);
-            overflow: hidden;
-            position: relative;
-            transform: rotateY(-5deg) rotateX(5deg);
-            transition: transform 0.5s ease;
-        }
-        
-        .phone-frame:hover {
-            transform: rotateY(0) rotateX(0) scale(1.02);
-            z-index: 10;
-        }
-
-        /* Mockup UI Elements */
-        .mock-header {
-            height: 50px;
-            background: rgba(15, 23, 42, 0.95);
-            border-bottom: 1px solid #1e293b;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            justify-content: space-between;
-        }
-        .mock-logo { font-weight: bold; font-size: 14px; color: #fff; }
-        .mock-logo span { color: #22d3ee; }
-
-        .mock-content { padding: 15px; }
-
-        .mock-card {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        .mock-card::before {
-            content: "";
-            position: absolute;
-            top: -10px; right: -10px;
-            width: 60px; height: 60px;
-            background: rgba(34, 211, 238, 0.1);
-            filter: blur(20px);
-            border-radius: 50%;
-        }
-
-        .mock-stat-label { font-size: 10px; color: #94a3b8; display: flex; align-items: center; gap: 4px; margin-bottom: 4px;}
-        .mock-stat-val { font-size: 24px; font-weight: 800; color: #fff; line-height: 1;}
-        .mock-stat-unit { font-size: 10px; color: #22d3ee; font-weight: bold; }
-
-        .mock-list-item {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(51, 65, 85, 0.5);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
-            display: flex;
+        /* GitHubボタン */
+        .github-btn {
+            display: inline-flex;
             align-items: center;
             gap: 10px;
+            background: #161b22; /* GitHub Dark Color */
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 25px;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
+            margin-top: 10px;
         }
-        .mock-icon {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px;
+        .github-btn:hover {
+            background: #30363d;
+            border-color: #8b949e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
-        .icon-fuel { background: rgba(34, 211, 238, 0.1); color: #22d3ee; }
-        .icon-main { background: rgba(249, 115, 22, 0.1); color: #f97316; }
-        
-        .mock-text-col { flex: 1; }
-        .mock-title { font-size: 11px; font-weight: bold; color: #e2e8f0; }
-        .mock-sub { font-size: 9px; color: #64748b; }
-        .mock-badge { font-size: 12px; font-weight: bold; color: #fff; }
-
-        .mock-fab {
-            position: absolute; bottom: 20px; right: 20px;
-            width: 44px; height: 44px;
-            background: #06b6d4;
-            border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
-            display: flex; align-items: center; justify-content: center;
-            color: #0f172a; font-weight: bold; font-size: 20px;
+        .github-icon {
+            font-weight: bold;
+            color: var(--terminal-green);
         }
 
-        /* --- Button --- */
+        /* 戻るボタン */
         .back-btn {
             display: inline-block;
             color: #fff;
@@ -246,10 +182,9 @@
         }
 
         .back-btn:hover {
-            background: var(--accent-cyan);
+            background: var(--accent-pink);
             color: #000;
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 15px var(--accent-cyan);
+            box-shadow: 0 0 15px var(--accent-pink);
         }
 
         footer {
@@ -271,8 +206,8 @@
                 <div class="breadcrumb">> ROOT / EIMU'S LAB / REPORT</div>
                 <h1>MOTOLOG</h1>
             </div>
-            <div style="font-family: 'Share Tech Mono'; color: var(--accent-cyan);">
-                ID: 03-BETA
+            <div style="font-family: 'Share Tech Mono'; color: var(--accent-purple);">
+                ID: 03
             </div>
         </header>
 
@@ -280,129 +215,51 @@
             
             <!-- 使用技術タグ -->
             <div class="tech-stack">
-                <span class="tag">Google Apps Script</span>
-                <span class="tag">React 18</span>
-                <span class="tag">Tailwind CSS</span>
-                <span class="tag">Chart.js</span>
-                <span class="tag">Google Sheets API</span>
+                <span class="tag">Gemini API</span>
+                <span class="tag">Python</span>
+                <span class="tag">Flask</span>
+                <span class="tag">SQLite</span>
             </div>
 
             <!-- 記事本文エリア -->
             <h2>PROJECT OVERVIEW</h2>
             <p>
-                「MOTOLOG」は、ライダーのための燃費・メンテナンス管理アプリケーションです。
-                Googleスプレッドシートをバックエンドデータベースとして活用し、ReactによるモダンなUIを組み合わせることで、
-                スマートフォンからの高速なデータ入力と、リアルタイムなデータ可視化を実現しました。
+                MOTOLOGは、愛車の状態を記録・分析するための燃費・メンテナンス管理アプリです。<br>
+                給油記録から燃費を自動計算し、メンテナンス時期のリマインド機能も備えています。
             </p>
-            <p>
-                従来のGASアプリの枠を超え、SPA（Single Page Application）として動作する設計を採用。
-                給油履歴からの自動燃費計算ロジックを搭載し、ユーザーの手計算を完全に排除しています。
-            </p>
-
-            <!-- CSS MOCKUP -->
-            <div class="mockup-wrapper">
-                <div class="phone-frame">
-                    <!-- Header -->
-                    <div class="mock-header">
-                        <div class="mock-logo">MOTO<span>LOG</span></div>
-                        <div style="width:6px; height:6px; background:#22d3ee; border-radius:50%;"></div>
-                    </div>
-                    
-                    <!-- Content -->
-                    <div class="mock-content">
-                        <!-- Dashboard Card -->
-                        <div class="mock-card">
-                            <div class="mock-stat-label">
-                                <span style="font-size:10px">▲</span> 平均燃費
-                            </div>
-                            <div>
-                                <span class="mock-stat-val">32.4</span>
-                                <span class="mock-stat-unit">km/L</span>
-                            </div>
-                            <div style="font-size:9px; color:#64748b; margin-top:4px;">
-                                最高記録: 35.1 km/L
-                            </div>
-                        </div>
-
-                        <!-- Secondary Cards -->
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:15px;">
-                            <div class="mock-card" style="margin:0; padding:10px;">
-                                <div class="mock-stat-label">総走行距離</div>
-                                <div style="font-size:14px; font-weight:bold; color:#fff;">12,850 <span style="font-size:9px; color:#64748b;">km</span></div>
-                            </div>
-                            <div class="mock-card" style="margin:0; padding:10px;">
-                                <div class="mock-stat-label">最新給油</div>
-                                <div style="font-size:14px; font-weight:bold; color:#fff;">11.0 <span style="font-size:9px; color:#64748b;">L</span></div>
-                            </div>
-                        </div>
-
-                        <div style="font-size:11px; font-weight:bold; color:#e2e8f0; margin-bottom:8px;">History</div>
-
-                        <!-- List Items -->
-                        <div class="mock-list-item">
-                            <div class="mock-icon icon-fuel">F</div>
-                            <div class="mock-text-col">
-                                <div class="mock-title">給油</div>
-                                <div class="mock-sub">2023-11-20</div>
-                            </div>
-                            <div class="mock-badge">31.2</div>
-                        </div>
-
-                        <div class="mock-list-item">
-                            <div class="mock-icon icon-fuel">F</div>
-                            <div class="mock-text-col">
-                                <div class="mock-title">給油</div>
-                                <div class="mock-sub">2023-11-05</div>
-                            </div>
-                            <div class="mock-badge">33.5</div>
-                        </div>
-
-                        <div class="mock-list-item">
-                            <div class="mock-icon icon-main">W</div>
-                            <div class="mock-text-col">
-                                <div class="mock-title">オイル交換</div>
-                                <div class="mock-sub">2023-10-20</div>
-                            </div>
-                            <div style="font-size:9px; color:#64748b;">12360km</div>
-                        </div>
-
-                    </div>
-                    
-                    <!-- FAB -->
-                    <div class="mock-fab">+</div>
-                </div>
-            </div>
 
             <h2>FEATURES</h2>
             <p>
-                <strong>1. 自動燃費計算アルゴリズム</strong><br>
-                ユーザーは「オドメーター」「給油量」を入力するだけ。アプリが前回の給油記録を自動探索し、走行距離の差分から燃費(km/L)を即座に算出します。
+                <strong>1. 燃費計算・分析</strong><br>
+                走行距離と給油量を入力するだけで、燃費を自動計算。Gemini APIが過去のデータと比較し、「前回より燃費が悪化しています。タイヤ空気圧をチェックしましょう」といったアドバイスを提供します。
             </p>
             <p>
-                <strong>2. ハイブリッド・データ管理</strong><br>
-                給油ログ（Fuel）とメンテナンスログ（Maintenance）を単一のタイムラインで管理。アイコンによる視覚的な区別を行い、車両の健康状態を一元管理可能です。
+                <strong>2. メンテナンス管理</strong><br>
+                オイル交換、タイヤ交換などの履歴を記録。次回の交換目安時期を予測して通知します。
             </p>
             <p>
-                <strong>3. 分析ダッシュボード</strong><br>
-                Chart.jsを用いた動的なグラフ描画機能を搭載。燃費の推移を可視化し、エンジンの不調や季節要因による変動を早期に発見できます。
+                <strong>3. カスタムログ</strong><br>
+                ツーリングの思い出や、カスタムパーツの取り付け記録も写真付きで保存可能です。
             </p>
 
             <h2>DEVELOPMENT NOTE</h2>
             <p>
-                GASの `HtmlService` 上でReactを動作させる構成を採用しました。
-                最大の課題は、`google.script.run` による非同期通信とUIの整合性でしたが、
-                Reactの `useEffect` フックによる状態管理と、ローカル環境（プレビュー）用のモックデータ自動切替ロジックを実装することで、
-                開発効率と安定性を両立させました。
+                データベースには軽量なSQLiteを採用し、個人利用に最適化しました。<br>
+                Gemini APIを活用することで、単なる記録アプリではなく「愛車のコンディションを見守るメカニック」のような存在を目指しました。
             </p>
-            <p>
-                UIデザインは、夜間のライディングでも目に優しいダークテーマ（Slate-900）を基調とし、
-                重要な数値にはCyan（#06b6d4）のアクセントカラーを使用することで、視認性を高めています。
-            </p>
+
+            <!-- GitHub Link Section -->
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 40px 0;">
+            <h3>>> ACCESS SOURCE CODE</h3>
+            <p>本プロジェクトのソースコードはGitHubにて公開しています。</p>
+            <a href="https://github.com/eimu-hoshii/MOTOLOG" target="_blank" class="github-btn">
+                <span class="github-icon">/></span> View on GitHub
+            </a>
 
         </main>
 
         <div style="text-align: center;">
-            <a href="#" class="back-btn"><< RETURN TO COMMAND CENTER</a>
+            <a href="index.html" class="back-btn"><< RETURN TO COMMAND CENTER</a>
         </div>
 
         <footer>
