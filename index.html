@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v3.1
+        /* * COMMAND CENTER STYLESHEET v3.2
          * Theme: Cyberpunk / Military Terminal / Holographic
-         * Update: Added System Sound (SFX) Module
+         * Update: Added Share Buttons
          */
 
         :root {
@@ -609,6 +609,26 @@
             opacity: 0.7;
         }
 
+        /* Share Buttons (New) */
+        .share-btn {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 20px;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid var(--accent-purple);
+            font-family: 'Share Tech Mono';
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            margin: 0 5px;
+        }
+        .share-btn:hover {
+            background: var(--accent-pink);
+            color: #000;
+            box-shadow: 0 0 10px var(--accent-pink);
+            transform: translateY(-2px);
+        }
+
         /* リアルタイム時計 */
         #clock-display {
             font-family: 'Share Tech Mono';
@@ -812,10 +832,6 @@
     <div class="container">
         
         <header>
-            <!-- 
-                【UPDATE】システムステータスに音声切り替えスイッチを追加
-                [AUDIO: OFF] をクリックすると音が鳴るようになります。
-            -->
             <div class="system-status">
                 <span>STATUS: ONLINE ●</span>
                 <span id="audio-toggle" onclick="toggleSound()">[AUDIO: OFF]</span>
@@ -959,6 +975,23 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <!-- シェアボタンエリア -->
+        <div style="text-align: center; margin-top: 40px; border-top: 1px dashed var(--accent-purple); padding-top: 20px;">
+            <p style="color: var(--accent-pink); margin-bottom: 15px; font-size: 0.9rem;">>> SHARE THIS FREQUENCY</p>
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px;">
+                <!-- X (Twitter) -->
+                <!-- ハッシュタグを #えいまー (%E3%81%88%E3%81%84%E3%81%BE%E3%83%BC) に変更 -->
+                <a href="https://twitter.com/intent/tweet?text=HOSHII%20EIMU%20%7C%20OFFICIAL%20COMMAND%20CENTER&url=https%3A%2F%2Feimu-hoshii.github.io%2F&hashtags=%E3%81%88%E3%81%84%E3%81%BE%E3%83%BC" target="_blank" class="share-btn" style="border-color: var(--terminal-green);">
+                    [ SHARE : X ]
+                </a>
+                <!-- COPY URL (変更) -->
+                <!-- buttonタグに変更し、JSでコピー処理を実行 -->
+                <button id="copy-btn" onclick="copyPageUrl()" class="share-btn" style="border-color: var(--accent-purple); background: rgba(255, 255, 255, 0.03); cursor: pointer;">
+                    [ COPY URL ]
+                </button>
             </div>
         </div>
 
@@ -1177,6 +1210,42 @@
             setTimeout(() => {
                 modal.style.display = 'none';
             }, 300);
+        }
+
+        // URLコピー機能
+        function copyPageUrl() {
+            // コピー対象のURL
+            const url = "https://eimu-hoshii.github.io/";
+            const btn = document.getElementById('copy-btn');
+            
+            // テキストエリアを作って選択してコピー（互換性のため）
+            const tempInput = document.createElement("input");
+            tempInput.style.position = "absolute";
+            tempInput.style.left = "-9999px";
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // 演出: ボタンのテキストと色を一時的に変更
+            btn.innerText = "[ COPIED! ]";
+            btn.style.borderColor = "var(--terminal-green)";
+            btn.style.color = "var(--terminal-green)";
+            btn.style.boxShadow = "0 0 10px var(--terminal-green)";
+            
+            // SFXがあれば鳴らす
+            if (typeof playClickSound === 'function' && isSoundEnabled) {
+                playClickSound();
+            }
+
+            // 2秒後に元に戻す
+            setTimeout(() => {
+                btn.innerText = "[ COPY URL ]";
+                btn.style.borderColor = "var(--accent-purple)";
+                btn.style.color = "#fff";
+                btn.style.boxShadow = "none";
+            }, 2000);
         }
 
         window.onclick = function(event) {
