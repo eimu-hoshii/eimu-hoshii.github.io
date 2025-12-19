@@ -8,11 +8,11 @@
  */
 
 const weeklySchedule = [
-    { day: "MON", time: "21:00", content: "VALORANT RANK" },
-    { day: "TUE", time: "---",   content: "OFFLINE (DATA ANALYSIS)" },
-    { day: "WED", time: "22:00", content: "Chatting / ZATSUDAN" },
-    { day: "THU", time: "---",   content: "OFFLINE (MAINTENANCE)" },
-    { day: "FRI", time: "21:00", content: "HORROR GAME" },
-    { day: "SAT", time: "14:00", content: "ENDURANCE STREAM" },
-    { day: "SUN", time: "20:00", content: "WEEKLY REPORT" }
+    { day: "MON", time: "00:30", content: "VALORANT(maybe)" },
+    { day: "TUE", time: "00:30", content: "VALORANT(maybe)" },
+    { day: "WED", time: "00:30", content: "VALORANT(maybe)" },
+    { day: "THU", time: "00:30", content: "VALORANT(maybe)" },
+    { day: "FRI", time: "00:30", content: "VALORANT(maybe)" },
+    { day: "SAT", time: "02:30", content: "VALORANT(maybe)" },
+    { day: "SUN", time: "02:30", content: "VALORANT(maybe)" }
 ];
