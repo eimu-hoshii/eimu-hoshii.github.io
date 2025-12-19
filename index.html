@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v2.5
+        /* * COMMAND CENTER STYLESHEET v2.6
          * Theme: Cyberpunk / Military Terminal / Holographic
-         * Update: Added System Log Panel & Custom Scrollbar
+         * Update: Reverted X Timeline (Layout Adjustment)
          */
 
         :root {
@@ -651,6 +651,23 @@
     </div>
 
     <div class="container">
+        
+        <header>
+            <div class="system-status">STATUS: ONLINE ●</div>
+            <div class="subtitle">SYSTEM ONLINE... [CONNECTED]</div>
+            <h1>HOSHII EIMU</h1>
+            <div style="margin-top: 10px;">
+                <span class="typing-effect">Commander / Tech Analyst / VTuber</span>
+            </div>
+            
+            <!-- 時計表示エリア -->
+            <div style="position: absolute; bottom: 10px; right: 0; font-family: 'Share Tech Mono'; color: var(--accent-purple); font-size: 0.9rem;">
+                loc: MAIZURU, JPN
+            </div>
+        </header>
+
+        <div class="main-grid">
+            
             <!-- 左カラム：立ち絵 ＆ ライブフィード ＆ Xタイムライン -->
             <div class="left-column">
                 <div class="chara-section">
@@ -665,7 +682,7 @@
                 </div>
 
                 <!-- Twitch Embed Panel -->
-                <div class="panel" style="margin-bottom: 25px;">
+                <div class="panel" style="margin-bottom: 0;">
                     <h2>LIVE FEED <span class="deco">/// CAM_01</span></h2>
                     <div class="twitch-container">
                         <iframe
@@ -681,25 +698,7 @@
                     </div>
                 </div>
 
-                <!-- X (Twitter) Timeline Panel -->
-                <div class="panel">
-                    <h2>COMMS LOG <span class="deco">/// X_FEED</span></h2>
-                    <!-- 
-                       高さを 600px から 400px に調整しました。
-                       これで右側のパネル群と高さのバランスが良くなります。
-                    -->
-                    <div style="height: 400px; overflow-y: auto; scrollbar-width: thin;">
-                        <a class="twitter-timeline" 
-                           data-theme="dark" 
-                           data-width="100%"
-                           data-height="400"
-                           data-chrome="noheader nofooter transparent" 
-                           href="https://twitter.com/hoshii_eimu?ref_src=twsrc%5Etfw">
-                           > CONNECTING TO X_SERVER...
-                        </a> 
-                        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-                    </div>
-                </div>
+                <!-- X Timeline Panel Removed -->
             </div>
 
             <!-- 右カラム：情報パネルエリア -->
@@ -735,20 +734,12 @@
                     <div class="log-container">
                         <!-- 最新が上に来るように -->
                         <div class="log-entry">
-                            <span class="log-date">[2025.05.20]</span>
-                            <span class="log-content">公式サイト「COMMAND CENTER」リニューアルオープン。</span>
+                            <span class="log-date">[2025.12.19]</span>
+                            <span class="log-content">システム各部の微調整、レイアウトの最適化を実施。</span>
                         </div>
                         <div class="log-entry">
-                            <span class="log-date">[2025.05.18]</span>
-                            <span class="log-content">YouTubeにて新作動画「深夜のセキュリティ事故分析」を公開しました。</span>
-                        </div>
-                        <div class="log-entry">
-                            <span class="log-date">[2025.05.15]</span>
-                            <span class="log-content">Twitch配信スケジュールを更新。今週はVALORANTランクマ強化週間です。</span>
-                        </div>
-                        <div class="log-entry">
-                            <span class="log-date">[2025.05.10]</span>
-                            <span class="log-content">自作ツール「MuscleMax」v1.0 リリース。Gemini API連携機能を実装。</span>
+                            <span class="log-date">[2025.12.18]</span>
+                            <span class="log-content">公式サイト「COMMAND CENTER」正式稼働開始 (Site Launch)。</span>
                         </div>
                     </div>
                 </div>
