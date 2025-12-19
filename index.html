@@ -4,15 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HOSHII EIMU | OFFICIAL COMMAND CENTER</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="個人勢VTuber星井詠夢（Hoshii Eimu）の公式サイト「COMMAND CENTER」。Twitch配信スケジュール、Gemini API活用ツールの公開、活動ログなどを発信中。">
+    <meta name="keywords" content="星井詠夢, Hoshii Eimu, VTuber, 個人勢, Gemini API, Python, Twitch, 公式サイト">
+    <meta name="author" content="Hoshii Eimu">
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <!-- OGP (Open Graph Protocol) for SNS -->
+    <meta property="og:title" content="HOSHII EIMU | OFFICIAL COMMAND CENTER">
+    <meta property="og:description" content="「午前2時の作戦会議室へようこそ」星井詠夢の公式サイト。配信状況、開発ツール、活動ログへアクセス可能です。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://eimu-hoshii.github.io/">
+    <meta property="og:image" content="https://eimu-hoshii.github.io/ogp_image.jpg">
+    <meta property="og:site_name" content="HOSHII EIMU OFFICIAL">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@hoshii_eimu">
+    <meta name="twitter:creator" content="@hoshii_eimu">
+    <meta name="twitter:title" content="HOSHII EIMU | OFFICIAL COMMAND CENTER">
+    <meta name="twitter:description" content="星井詠夢の公式サイト。配信スケジュール、開発ログ、各種リンクを集約した作戦指令室。">
+    <meta name="twitter:image" content="https://eimu-hoshii.github.io/ogp_image.jpg">
+
     <!-- フォント読み込み -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v3.2
+        /* * COMMAND CENTER STYLESHEET v3.3
          * Theme: Cyberpunk / Military Terminal / Holographic
-         * Update: Added Share Buttons
+         * Update: Added SEO/OGP Meta Tags
          */
 
         :root {
@@ -924,10 +950,6 @@
                     <div class="log-container">
                         <div class="log-entry">
                             <span class="log-date">[2025.12.19]</span>
-                            <span class="log-content">自作アプリのGithubリンク追加。</span>
-                        </div>
-                        <div class="log-entry">
-                            <span class="log-date">[2025.12.19]</span>
                             <span class="log-content">システム各部の微調整、レイアウトの最適化を実施。</span>
                         </div>
                         <div class="log-entry">
@@ -987,12 +1009,10 @@
             <p style="color: var(--accent-pink); margin-bottom: 15px; font-size: 0.9rem;">>> SHARE THIS FREQUENCY</p>
             <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px;">
                 <!-- X (Twitter) -->
-                <!-- ハッシュタグを #えいまー (%E3%81%88%E3%81%84%E3%81%BE%E3%83%BC) に変更 -->
                 <a href="https://twitter.com/intent/tweet?text=HOSHII%20EIMU%20%7C%20OFFICIAL%20COMMAND%20CENTER&url=https%3A%2F%2Feimu-hoshii.github.io%2F&hashtags=%E3%81%88%E3%81%84%E3%81%BE%E3%83%BC" target="_blank" class="share-btn" style="border-color: var(--terminal-green);">
                     [ SHARE : X ]
                 </a>
-                <!-- COPY URL (変更) -->
-                <!-- buttonタグに変更し、JSでコピー処理を実行 -->
+                <!-- COPY URL -->
                 <button id="copy-btn" onclick="copyPageUrl()" class="share-btn" style="border-color: var(--accent-purple); background: rgba(255, 255, 255, 0.03); cursor: pointer;">
                     [ COPY URL ]
                 </button>
@@ -1060,7 +1080,6 @@
         // 起動画面の処理
         window.addEventListener('load', () => {
             const bootScreen = document.getElementById('boot-screen');
-            // 2.2秒後にフェードアウト
             setTimeout(() => {
                 bootScreen.style.opacity = '0';
                 setTimeout(() => {
@@ -1079,7 +1098,6 @@
         const cursorMain = document.getElementById('cursor-main');
         const cursorRing = document.getElementById('cursor-ring');
         
-        // PCのみ有効化する判定（タッチデバイスでは動かさない）
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         if (!isTouchDevice) {
@@ -1087,22 +1105,20 @@
                 cursorMain.style.left = e.clientX + 'px';
                 cursorMain.style.top = e.clientY + 'px';
                 
-                // リングは少し遅れてついてくる演出
                 setTimeout(() => {
                     cursorRing.style.left = e.clientX + 'px';
                     cursorRing.style.top = e.clientY + 'px';
                 }, 50);
             });
 
-            // インタラクティブ要素へのホバー検知
             const interactables = document.querySelectorAll('a, button, .link-btn, .close-btn, .nav-item, #audio-toggle');
             interactables.forEach(el => {
                 el.addEventListener('mouseenter', () => {
                     document.body.classList.add('hovering');
-                    playHoverSound(); // ホバー音再生
+                    playHoverSound(); 
                 });
                 el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-                el.addEventListener('click', playClickSound); // クリック音再生
+                el.addEventListener('click', playClickSound); 
             });
         }
 
@@ -1116,7 +1132,6 @@
             btn.innerText = isSoundEnabled ? "[AUDIO: ON]" : "[AUDIO: OFF]";
             btn.style.color = isSoundEnabled ? "var(--terminal-green)" : "#555";
             
-            // 音声がONになったら確認音を鳴らす
             if (isSoundEnabled) playClickSound();
         }
 
@@ -1127,7 +1142,6 @@
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
-            // 高音で短く「ピピッ」
             osc.type = 'sine';
             osc.frequency.setValueAtTime(800, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
@@ -1149,7 +1163,6 @@
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             
-            // 少し低音で「カッ」
             osc.type = 'square';
             osc.frequency.setValueAtTime(200, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
@@ -1196,7 +1209,7 @@
             
             document.getElementById('clock-display').innerText = `${hours}:${minutes}:${seconds}:${ms}`;
         }
-        setInterval(updateClock, 30); // 30msごとに更新
+        setInterval(updateClock, 30); 
         updateClock();
 
         // モーダル制御
@@ -1218,11 +1231,9 @@
 
         // URLコピー機能
         function copyPageUrl() {
-            // コピー対象のURL
             const url = "https://eimu-hoshii.github.io/";
             const btn = document.getElementById('copy-btn');
             
-            // テキストエリアを作って選択してコピー（互換性のため）
             const tempInput = document.createElement("input");
             tempInput.style.position = "absolute";
             tempInput.style.left = "-9999px";
@@ -1232,18 +1243,15 @@
             document.execCommand("copy");
             document.body.removeChild(tempInput);
 
-            // 演出: ボタンのテキストと色を一時的に変更
             btn.innerText = "[ COPIED! ]";
             btn.style.borderColor = "var(--terminal-green)";
             btn.style.color = "var(--terminal-green)";
             btn.style.boxShadow = "0 0 10px var(--terminal-green)";
             
-            // SFXがあれば鳴らす
             if (typeof playClickSound === 'function' && isSoundEnabled) {
                 playClickSound();
             }
 
-            // 2秒後に元に戻す
             setTimeout(() => {
                 btn.innerText = "[ COPY URL ]";
                 btn.style.borderColor = "var(--accent-purple)";
