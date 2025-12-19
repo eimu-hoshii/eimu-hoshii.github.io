@@ -777,10 +777,14 @@
                     <h2>EIMU'S LAB <span class="deco">/// DEV_LOG_04</span></h2>
                     <p>Gemini APIを活用した自作ツール開発記録</p>
                     <div class="link-list">
-                        <!-- IDとOnClickイベントを追加 -->
-                        <a onclick="openModal('gemini-modal')" class="link-btn" style="border-color: var(--terminal-green);">
+                        <!-- 
+                           【修正】<a>タグから<div>タグに変更しました。
+                           これにより、クリック時に新しいタブが開くのを物理的に防ぎます。
+                           class="link-btn" があるので見た目はボタンのままです。
+                        -->
+                        <div onclick="openModal('gemini-modal')" class="link-btn" style="border-color: var(--terminal-green);">
                             > Access Project GEMINI
-                        </a>
+                        </div>
                         
                         <!-- リンクを更新: このサイト自体のソースコード/紹介へのリンク -->
                         <a href="#" class="link-btn" style="border-color: var(--terminal-green);">
