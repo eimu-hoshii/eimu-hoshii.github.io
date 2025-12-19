@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v2.10
+        /* * COMMAND CENTER STYLESHEET v3.1
          * Theme: Cyberpunk / Military Terminal / Holographic
-         * Update: Fixed layout bug in right column
+         * Update: Added System Sound (SFX) Module
          */
 
         :root {
@@ -29,6 +29,12 @@
 
         * {
             box-sizing: border-box;
+            cursor: none; /* デフォルトカーソルを非表示 */
+        }
+
+        /* スムーズスクロール */
+        html {
+            scroll-behavior: smooth;
         }
 
         /* カスタムスクロールバー (Webkit) */
@@ -88,6 +94,85 @@
             100% { background-position: 0 100%; }
         }
 
+        /* --- Custom Cursor --- */
+        #cursor-main {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background: var(--terminal-green);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.2s;
+            mix-blend-mode: difference;
+        }
+        #cursor-ring {
+            position: fixed;
+            top: 0; left: 0;
+            width: 40px; height: 40px;
+            border: 1px solid var(--accent-pink);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, border-color 0.3s, top 0.1s ease-out, left 0.1s ease-out;
+        }
+        /* ホバー時のカーソル変化 */
+        body.hovering #cursor-main {
+            width: 0; height: 0;
+            opacity: 0;
+        }
+        body.hovering #cursor-ring {
+            width: 60px; height: 60px;
+            background: rgba(255, 64, 176, 0.1);
+            border-color: var(--terminal-green);
+            border-width: 2px;
+        }
+
+        /* --- Navigation Menu --- */
+        .nav-container {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(5, 5, 8, 0.9);
+            border-bottom: 1px solid var(--accent-purple);
+            backdrop-filter: blur(5px);
+            padding: 10px 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 5px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-x: auto; /* スマホで横スクロール */
+            white-space: nowrap;
+            max-width: 100%;
+            scrollbar-width: none; /* スクロールバー隠す */
+        }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        
+        .nav-item a {
+            display: block;
+            padding: 8px 16px;
+            color: var(--accent-purple);
+            text-decoration: none;
+            font-family: 'Share Tech Mono';
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        .nav-item a:hover {
+            color: var(--terminal-green);
+            background: rgba(0, 255, 65, 0.1);
+            border-color: var(--terminal-green);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
         /* 起動画面（ローディング） */
         #boot-screen {
             position: fixed;
@@ -96,7 +181,7 @@
             width: 100%;
             height: 100%;
             background: #000;
-            z-index: 10000;
+            z-index: 20000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -104,6 +189,7 @@
             color: var(--terminal-green);
             font-size: 1.2rem;
             transition: opacity 0.5s ease;
+            cursor: auto; /* 起動中は通常カーソル */
         }
 
         .loader-text {
@@ -146,10 +232,9 @@
         /* ヘッダー */
         header {
             text-align: center;
-            padding: 60px 0 30px;
-            margin-bottom: 40px;
+            padding: 60px 0 20px;
+            margin-bottom: 0; /* Navが入るのでマージン調整 */
             position: relative;
-            border-bottom: 1px solid var(--accent-purple);
         }
 
         header::before, header::after {
@@ -171,6 +256,21 @@
             border: 1px solid var(--terminal-green);
             padding: 4px 8px;
             background: rgba(0, 255, 65, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* オーディオスイッチ用スタイル */
+        #audio-toggle {
+            cursor: pointer;
+            color: #555; /* デフォルトは暗く */
+            border-left: 1px solid #333;
+            padding-left: 10px;
+            transition: color 0.3s;
+        }
+        #audio-toggle:hover {
+            color: #fff;
         }
 
         h1 {
@@ -227,6 +327,7 @@
             grid-template-columns: 4fr 6fr;
             gap: 40px;
             align-items: start;
+            margin-top: 40px; /* Nav分の余白 */
         }
 
         .left-column {
@@ -241,6 +342,10 @@
             }
             h1 { font-size: 2.5rem; }
             .left-column { order: -1; }
+            
+            /* スマホではカスタムカーソル無効化 */
+            * { cursor: auto; }
+            #cursor-main, #cursor-ring { display: none; }
         }
 
         /* 立ち絵エリア（ホログラム風） */
@@ -317,6 +422,7 @@
                 100% calc(100% - 20px), calc(100% - 20px) 100%, 
                 0 100%, 0 20px
             );
+            scroll-margin-top: 80px; /* スクロール位置調整 */
         }
 
         /* HUDコーナー装飾 */
@@ -400,7 +506,7 @@
             color: #ddd;
         }
         
-        /* SCHEDULE Styles (新規追加) */
+        /* SCHEDULE Styles */
         .schedule-row {
             display: flex;
             align-items: center;
@@ -425,7 +531,6 @@
             flex: 1;
             color: #fff;
         }
-        /* 今日の予定をハイライト */
         .schedule-row.active-day {
             background: rgba(255, 64, 176, 0.15);
             border-left: 3px solid var(--accent-pink);
@@ -445,11 +550,6 @@
             animation: blink 1s infinite;
         }
         .schedule-row.active-day .active-badge { display: inline; }
-
-        /* Twitter埋め込みの背景調整 */
-        .twitter-timeline {
-            background: transparent !important;
-        }
 
         /* Twitch埋め込みスタイル */
         .twitch-container {
@@ -598,9 +698,7 @@
             color: #ddd;
         }
 
-        /* * Project List Styles 
-         * モーダル内のプロジェクト一覧用スタイル
-         */
+        /* * Project List Styles */
         .project-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -683,6 +781,10 @@
 </head>
 <body>
 
+    <!-- カスタムカーソル要素 -->
+    <div id="cursor-main"></div>
+    <div id="cursor-ring"></div>
+
     <!-- 起動画面 -->
     <div id="boot-screen">
         <div class="loader-text">
@@ -696,10 +798,29 @@
         </div>
     </div>
 
+    <!-- ナビゲーションメニュー -->
+    <nav class="nav-container">
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="#profile-panel">[ PROFILE ]</a></li>
+            <li class="nav-item"><a href="#schedule-panel">[ SCHEDULE ]</a></li>
+            <li class="nav-item"><a href="#log-panel">[ SYS_LOG ]</a></li>
+            <li class="nav-item"><a href="#links-panel">[ DEPLOY ]</a></li>
+            <li class="nav-item"><a href="#lab-panel">[ EIMU'S LAB ]</a></li>
+        </ul>
+    </nav>
+
     <div class="container">
         
         <header>
-            <div class="system-status">STATUS: ONLINE ●</div>
+            <!-- 
+                【UPDATE】システムステータスに音声切り替えスイッチを追加
+                [AUDIO: OFF] をクリックすると音が鳴るようになります。
+            -->
+            <div class="system-status">
+                <span>STATUS: ONLINE ●</span>
+                <span id="audio-toggle" onclick="toggleSound()">[AUDIO: OFF]</span>
+            </div>
+            
             <div class="subtitle">SYSTEM ONLINE... [CONNECTED]</div>
             <h1>HOSHII EIMU</h1>
             <div style="margin-top: 10px;">
@@ -708,7 +829,7 @@
             
             <!-- 時計表示エリア -->
             <div style="position: absolute; bottom: 10px; right: 0; font-family: 'Share Tech Mono'; color: var(--accent-purple); font-size: 0.9rem;">
-                loc: MAIZURU, JPN
+                loc: JPN
             </div>
         </header>
 
@@ -731,11 +852,6 @@
                 <div class="panel" style="margin-bottom: 0;">
                     <h2>LIVE FEED <span class="deco">/// CAM_01</span></h2>
                     <div class="twitch-container">
-                        <!-- 
-                            【UPDATE】自動再生対応
-                            &autoplay=true&muted=true を追加しました。
-                            これにより、サイトロード時に自動で再生が開始されます（音声はミュート状態）。
-                        -->
                         <iframe
                             class="twitch-iframe"
                             src="https://player.twitch.tv/?channel=hoshiieimu&parent=eimu-hoshii.github.io&autoplay=true&muted=true"
@@ -749,11 +865,8 @@
                     </div>
                 </div>
 
-                <!-- 
-                   【UPDATE】スケジュールパネルをここに移動しました。
-                   Twitchパネル(LIVE)の下に配置することで、「現在→未来」の情報フローを作ります。
-                -->
-                <div class="panel">
+                <!-- スケジュールパネル（ID追加） -->
+                <div class="panel" id="schedule-panel">
                     <h2>MISSION SCHEDULE <span class="deco">/// OPS_CYCLE</span></h2>
                     <!-- JSで自動生成されるエリア -->
                     <div id="schedule-list">
@@ -767,7 +880,7 @@
                 
                 <div id="clock-display">00:00:00</div>
 
-                <div class="panel">
+                <div class="panel" id="profile-panel">
                     <h2>PROFILE <span class="deco">/// DATA_01</span></h2>
                     <div class="data-row">
                         <span class="data-label">NAME</span>
@@ -789,11 +902,10 @@
                     </div>
                 </div>
 
-                <!-- SYSTEM LOG Panel (新規追加) -->
-                <div class="panel">
+                <!-- SYSTEM LOG Panel (ID追加) -->
+                <div class="panel" id="log-panel">
                     <h2>SYSTEM LOG <span class="deco">/// UPDATES_02</span></h2>
                     <div class="log-container">
-                        <!-- 最新が上に来るように -->
                         <div class="log-entry">
                             <span class="log-date">[2025.12.19]</span>
                             <span class="log-content">システム各部の微調整、レイアウトの最適化を実施。</span>
@@ -805,7 +917,7 @@
                     </div>
                 </div>
 
-                <div class="panel">
+                <div class="panel" id="links-panel">
                     <h2>DEPLOYMENT <span class="deco">/// LINKS_03</span></h2>
                     <div class="link-grid">
                         <!-- Main Platforms -->
@@ -834,20 +946,13 @@
                     </div>
                 </div>
 
-                <div class="panel" style="border-left: 4px solid var(--terminal-green);">
+                <div class="panel" id="lab-panel" style="border-left: 4px solid var(--terminal-green);">
                     <h2>EIMU'S LAB <span class="deco">/// DEV_LOG_04</span></h2>
                     <p>Gemini APIを活用した自作ツール開発記録</p>
                     <div class="link-list">
-                        <!-- 
-                           【修正】<a>タグから<div>タグに変更しました。
-                           これにより、クリック時に新しいタブが開くのを物理的に防ぎます。
-                           class="link-btn" があるので見た目はボタンのままです。
-                        -->
                         <div onclick="openModal('gemini-modal')" class="link-btn" style="border-color: var(--terminal-green);">
                             > Access Project GEMINI
                         </div>
-                        
-                        <!-- リンクを更新: このサイト自体のソースコード/紹介へのリンク -->
                         <a href="#" class="link-btn" style="border-color: var(--terminal-green);">
                             > System Architecture [Built w/ Gemini]
                         </a>
@@ -882,10 +987,6 @@
                         <span class="tech-tag">AI / LLM</span>
                         <h4>AI STREAM PARTNER</h4>
                         <p class="project-desc">AI配信パートナーシステム（AI会話ツール）。コメントにリアルタイムで反応する相棒AI。</p>
-                        <!-- 
-                            【修正】target="_blank" を削除しました。
-                            これにより、クリック時に新しいタブではなく同じタブで遷移します。
-                        -->
                         <a href="ai-partner.html" class="launch-btn">>> READ_REPORT [DOCS]</a>
                     </div>
 
@@ -894,9 +995,6 @@
                         <span class="tech-tag">HEALTH</span>
                         <h4>MuscleMax</h4>
                         <p class="project-desc">筋トレ管理ツール。トレーニング記録とAIによる最適メニュー提案。</p>
-                        <!-- 
-                            【修正】target="_blank" を削除しました。
-                        -->
                         <a href="muscle-max.html" class="launch-btn">>> READ_REPORT [DOCS]</a>
                     </div>
 
@@ -905,9 +1003,6 @@
                         <span class="tech-tag">AUTO / LOG</span>
                         <h4>MOTOLOG</h4>
                         <p class="project-desc">燃費・メンテナンス管理アプリ。愛車の状態を記録・分析。</p>
-                        <!-- 
-                            【修正】target="_blank" を削除しました。
-                        -->
                         <a href="motolog.html" class="launch-btn">>> READ_REPORT [DOCS]</a>
                     </div>
                 </div>
@@ -922,10 +1017,6 @@
         </div>
     </div>
 
-    <!-- 
-        【重要】スケジュールデータを外部ファイルから読み込みます。
-        index.htmlと同じ場所に schedule.js を置いてください。
-    -->
     <script src="schedule.js"></script>
 
     <script>
@@ -940,8 +1031,6 @@
                 }, 500);
             }, 2200);
 
-            // スケジュール表の生成
-            // schedule.js が正しく読み込まれていれば実行されます
             if (typeof weeklySchedule !== 'undefined') {
                 renderSchedule();
             } else {
@@ -949,15 +1038,103 @@
             }
         });
 
+        // カスタムカーソル処理
+        const cursorMain = document.getElementById('cursor-main');
+        const cursorRing = document.getElementById('cursor-ring');
+        
+        // PCのみ有効化する判定（タッチデバイスでは動かさない）
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        if (!isTouchDevice) {
+            window.addEventListener('mousemove', (e) => {
+                cursorMain.style.left = e.clientX + 'px';
+                cursorMain.style.top = e.clientY + 'px';
+                
+                // リングは少し遅れてついてくる演出
+                setTimeout(() => {
+                    cursorRing.style.left = e.clientX + 'px';
+                    cursorRing.style.top = e.clientY + 'px';
+                }, 50);
+            });
+
+            // インタラクティブ要素へのホバー検知
+            const interactables = document.querySelectorAll('a, button, .link-btn, .close-btn, .nav-item, #audio-toggle');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    document.body.classList.add('hovering');
+                    playHoverSound(); // ホバー音再生
+                });
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+                el.addEventListener('click', playClickSound); // クリック音再生
+            });
+        }
+
+        // --- Sound System (SFX) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isSoundEnabled = false;
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            const btn = document.getElementById('audio-toggle');
+            btn.innerText = isSoundEnabled ? "[AUDIO: ON]" : "[AUDIO: OFF]";
+            btn.style.color = isSoundEnabled ? "var(--terminal-green)" : "#555";
+            
+            // 音声がONになったら確認音を鳴らす
+            if (isSoundEnabled) playClickSound();
+        }
+
+        function playHoverSound() {
+            if (!isSoundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            // 高音で短く「ピピッ」
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+            
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function playClickSound() {
+            if (!isSoundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            // 少し低音で「カッ」
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
         // スケジュール描画関数
         function renderSchedule() {
             const container = document.getElementById('schedule-list');
             const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-            const today = days[new Date().getDay()]; // 今日の曜日を取得 (例: "MON")
+            const today = days[new Date().getDay()]; 
 
             let html = '';
             weeklySchedule.forEach(item => {
-                // 今日かどうか判定
                 const isActive = item.day === today ? 'active-day' : '';
                 const activeBadge = item.day === today ? '<span class="active-badge">◀ ACTIVE</span>' : '';
 
@@ -989,7 +1166,6 @@
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.style.display = 'flex';
-            // 少し遅延させてopacityを変更することでアニメーションさせる
             setTimeout(() => {
                 modal.classList.add('active');
             }, 10);
@@ -998,13 +1174,11 @@
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.remove('active');
-            // アニメーションが終わってからdisplayをnoneにする
             setTimeout(() => {
                 modal.style.display = 'none';
             }, 300);
         }
 
-        // モーダルの外側をクリックしたら閉じる
         window.onclick = function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.classList.remove('active');
