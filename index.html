@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* * COMMAND CENTER STYLESHEET v2.8
+        /* * COMMAND CENTER STYLESHEET v2.9
          * Theme: Cyberpunk / Military Terminal / Holographic
-         * Update: Removed target="_blank" from modal links
+         * Update: Added Mission Schedule Panel
          */
 
         :root {
@@ -399,6 +399,52 @@
         .log-content {
             color: #ddd;
         }
+        
+        /* SCHEDULE Styles (新規追加) */
+        .schedule-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-family: 'Share Tech Mono';
+            transition: background 0.3s;
+        }
+        .schedule-row:last-child { border-bottom: none; }
+        
+        .sch-day {
+            width: 50px;
+            color: var(--accent-purple);
+            font-weight: bold;
+        }
+        .sch-time {
+            width: 60px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .sch-content {
+            flex: 1;
+            color: #fff;
+        }
+        /* 今日の予定をハイライト */
+        .schedule-row.active-day {
+            background: rgba(255, 64, 176, 0.15);
+            border-left: 3px solid var(--accent-pink);
+        }
+        .schedule-row.active-day .sch-day {
+            color: var(--accent-pink);
+        }
+        .schedule-row.active-day .sch-content {
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--accent-pink);
+        }
+        .active-badge {
+            display: none;
+            color: var(--terminal-green);
+            font-size: 0.7rem;
+            margin-left: 10px;
+            animation: blink 1s infinite;
+        }
+        .schedule-row.active-day .active-badge { display: inline; }
 
         /* Twitter埋め込みの背景調整 */
         .twitter-timeline {
@@ -703,7 +749,17 @@
                     </div>
                 </div>
 
-                <!-- X Timeline Panel Removed -->
+                <!-- 
+                   【UPDATE】スケジュールパネルをここに移動しました。
+                   Twitchパネル(LIVE)の下に配置することで、「現在→未来」の情報フローを作ります。
+                -->
+                <div class="panel">
+                    <h2>MISSION SCHEDULE <span class="deco">/// OPS_CYCLE</span></h2>
+                    <!-- JSで自動生成されるエリア -->
+                    <div id="schedule-list">
+                        <!-- Loading... -->
+                    </div>
+                </div>
             </div>
 
             <!-- 右カラム：情報パネルエリア -->
@@ -740,6 +796,13 @@
                         <!-- 最新が上に来るように -->
                         <div class="log-entry">
                             <span class="log-date">[2025.12.19]</span>
+                <!-- SYSTEM LOG Panel -->
+                <div class="panel">
+                    <h2>SYSTEM LOG <span class="deco">/// UPDATES_02</span></h2>
+                    <div class="log-container">
+                        <!-- 最新が上に来るように -->
+                        <div class="log-entry">
+                            <span class="log-date">[2025.12.19]</span>
                             <span class="log-content">システム各部の微調整、レイアウトの最適化を実施。</span>
                         </div>
                         <div class="log-entry">
@@ -748,6 +811,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- SCHEDULE Panel は左カラムへ移動しました -->
 
                 <div class="panel">
                     <h2>DEPLOYMENT <span class="deco">/// LINKS_03</span></h2>
@@ -866,6 +931,12 @@
         </div>
     </div>
 
+    <!-- 
+        【重要】スケジュールデータを外部ファイルから読み込みます。
+        index.htmlと同じ場所に schedule.js を置いてください。
+    -->
+    <script src="schedule.js"></script>
+
     <script>
         // 起動画面の処理
         window.addEventListener('load', () => {
@@ -877,7 +948,38 @@
                     bootScreen.style.display = 'none';
                 }, 500);
             }, 2200);
+
+            // スケジュール表の生成
+            // schedule.js が正しく読み込まれていれば実行されます
+            if (typeof weeklySchedule !== 'undefined') {
+                renderSchedule();
+            } else {
+                document.getElementById('schedule-list').innerHTML = '<div style="color:red">> ERROR: schedule.js NOT FOUND</div>';
+            }
         });
+
+        // スケジュール描画関数
+        function renderSchedule() {
+            const container = document.getElementById('schedule-list');
+            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+            const today = days[new Date().getDay()]; // 今日の曜日を取得 (例: "MON")
+
+            let html = '';
+            weeklySchedule.forEach(item => {
+                // 今日かどうか判定
+                const isActive = item.day === today ? 'active-day' : '';
+                const activeBadge = item.day === today ? '<span class="active-badge">◀ ACTIVE</span>' : '';
+
+                html += `
+                    <div class="schedule-row ${isActive}">
+                        <div class="sch-day">${item.day}</div>
+                        <div class="sch-time">${item.time}</div>
+                        <div class="sch-content">${item.content}${activeBadge}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
 
         // リアルタイム時計の処理
         function updateClock() {
