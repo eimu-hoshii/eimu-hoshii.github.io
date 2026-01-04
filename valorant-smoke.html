@@ -217,6 +217,11 @@
         let startX, startY;
         const MIN_SCALE = 1; // 縮小限界
         const MAX_SCALE = 4; // 拡大限界
+        
+        // ピンチ操作用の変数
+        let initialPinchDistance = 0;
+        let initialScale = 1;
+        let lastTapTime = 0; // ダブルタップ用
 
         // ▼ DOM要素
         const elements = {
@@ -385,7 +390,7 @@
         function setupInteractions() {
             const vp = elements.viewport;
 
-            // --- マウス操作 ---
+            // --- マウス操作 (PC用) ---
             vp.addEventListener('mousedown', e => {
                 if (scale === 1) return; // 等倍時はドラッグ無効（UX向上のため）
                 isDragging = true;
@@ -421,37 +426,70 @@
             }, { passive: false });
 
 
-            // --- タッチ操作（パンのみ、ピンチは簡易対応したいが複雑さを避けるためボタン推奨） ---
-            // ※本格的なピンチイン・アウトを実装するにはコード量が増えるため、今回は「1本指ドラッグ」と「ボタンズーム」の構成にします。
+            // --- タッチ操作（実機用: ピンチ＆パン） ---
             
             vp.addEventListener('touchstart', e => {
-                if (e.touches.length === 1 && scale > 1) {
+                // ピンチ開始（2本指）
+                if (e.touches.length === 2) {
+                    isDragging = false; // ピンチ中は移動モードをキャンセル
+                    initialPinchDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    initialScale = scale;
+                }
+                // 移動開始（1本指）
+                // ※拡大中(scale > 1)のみ移動可能とする
+                else if (e.touches.length === 1 && scale > 1) {
                     isDragging = true;
                     startX = e.touches[0].clientX - pX;
                     startY = e.touches[0].clientY - pY;
                 }
-                // ダブルタップ判定
+                
+                // ダブルタップ判定（トントンと叩くとリセット）
                 if (e.touches.length === 1) {
                     const now = new Date().getTime();
-                    const timeSince = now - (this.lastTouch || 0);
+                    const timeSince = now - lastTapTime;
                     if (timeSince < 300 && timeSince > 0) {
-                        // Double tap detected
-                        resetView();
+                        resetView(); // リセット実行
                     }
-                    this.lastTouch = now;
+                    lastTapTime = now;
                 }
             }, { passive: false });
 
             vp.addEventListener('touchmove', e => {
-                if (!isDragging) return;
-                e.preventDefault(); // スクロール防止
-                pX = e.touches[0].clientX - startX;
-                pY = e.touches[0].clientY - startY;
-                requestAnimationFrame(applyTransform);
+                // ピンチ中（拡大縮小）
+                if (e.touches.length === 2) {
+                    e.preventDefault(); // ブラウザのズーム等を防ぐ
+                    
+                    const currentDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+
+                    if (initialPinchDistance > 0) {
+                        const zoomFactor = currentDistance / initialPinchDistance;
+                        // 拡大率を計算して適用
+                        scale = Math.min(Math.max(initialScale * zoomFactor, MIN_SCALE), MAX_SCALE);
+                        applyTransform();
+                    }
+                }
+                // 移動中（1本指ドラッグ）
+                else if (isDragging && e.touches.length === 1) {
+                    e.preventDefault(); // スクロール防止
+                    pX = e.touches[0].clientX - startX;
+                    pY = e.touches[0].clientY - startY;
+                    requestAnimationFrame(applyTransform);
+                }
             }, { passive: false });
 
-            vp.addEventListener('touchend', () => {
+            vp.addEventListener('touchend', e => {
+                // 指が離れたらドラッグ終了
+                // 2本指から1本指になった場合の挙動ズレを防ぐため、一度リセット推奨
                 isDragging = false;
+                if (e.touches.length === 0) {
+                    initialPinchDistance = 0;
+                }
             });
         }
 
