@@ -34,6 +34,7 @@
             justify-content: center;
             transform-origin: center center;
             will-change: transform;
+            padding: 1rem; /* 少し余白を追加 */
         }
 
         .pt-safe { padding-top: env(safe-area-inset-top); }
@@ -99,7 +100,8 @@
             <!-- マップビューポート -->
             <div id="viewport" class="map-viewport touch-action-none">
                 <div id="mapTransformLayer">
-                    <img id="mapImage" src="" alt="Map Setup" class="max-w-none w-auto h-auto max-h-[90%] object-contain shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none">
+                    <!-- 変更箇所: max-w-none を削除し、max-w-full max-h-full で画面内に収める -->
+                    <img id="mapImage" src="" alt="Map Setup" class="max-w-full max-h-full object-contain shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none">
                 </div>
                 
                 <!-- ロード中 -->
