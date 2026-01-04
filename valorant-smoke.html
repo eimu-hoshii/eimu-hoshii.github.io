@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport-fit=cover を追加して、ノッチエリアまで背景を広げる -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- ▼ iOS用 Webアプリ化設定 (ホーム画面に追加した時に有効) ▼ -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SMOKE GUIDE">
+    <!-- ▲ ここまで ▲ -->
+
+    <title>VALORANT SMOKE GUIDE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- アイコン -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* タッチ操作の無効化（マップエリアのみJSで制御するため） */
+        .touch-action-none { touch-action: none; }
+        
+        /* スムーズなアニメーション（変形以外） */
+        .transition-ui { transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform; transition-duration: 200ms; }
+        
+        /* マップ画像のコンテナ */
+        .map-viewport {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0f172a; /* Slate 900 */
+            position: relative;
+            cursor: grab;
+            /* ノッチ対策: 上部の余白確保はbody/mainで行うが、背景は全体に */
+        }
+        .map-viewport:active { cursor: grabbing; }
+
+        /* 画像本体（変形対象） */
+        #mapTransformLayer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center center;
+            will-change: transform;
+            /* JS側でtransform制御中はtransitionを消す */
+        }
+
+        /* セーフエリア対応ユーティリティ */
+        .pt-safe { padding-top: env(safe-area-inset-top); }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans overflow-hidden h-screen flex flex-col select-none">
+
+    <!-- ========================================== -->
+    <!-- ヘッダーエリア -->
+    <!-- ========================================== -->
+    <!-- pt-safe を追加してステータスバーと被らないようにする -->
+    <header class="flex-none bg-slate-800/90 backdrop-blur-md border-b border-slate-700 px-4 pt-safe h-[calc(60px+env(safe-area-inset-top))] flex justify-between items-center z-30 shadow-md box-content">
+        <div class="flex items-center gap-2 h-[60px]">
+            <div class="bg-red-500/10 p-1.5 rounded-lg border border-red-500/20">
+                <i data-lucide="map" class="w-5 h-5 text-red-500"></i>
+            </div>
+            <h1 class="font-bold text-lg tracking-wider bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">SMOKE GUIDE</h1>
+        </div>
+        <!-- ハンバーガーメニュー (スマホ用) -->
+        <button id="menuBtn" class="p-2 -mr-2 hover:bg-slate-700/50 rounded-lg md:hidden active:bg-slate-600/50 transition-ui h-[60px] flex items-center">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <!-- ========================================== -->
+        <!-- サイドバー (マップ選択) -->
+        <!-- ========================================== -->
+        <aside id="sidebar" class="
+            fixed md:relative top-0 left-0 
+            h-full md:h-full w-64 
+            bg-slate-800/95 backdrop-blur border-r border-slate-700 
+            transform -translate-x-full md:translate-x-0 
+            transition-transform duration-300 z-40 shadow-2xl md:shadow-none
+            pt-[calc(60px+env(safe-area-inset-top))] md:pt-0
+        ">
+            <div class="flex flex-col h-full">
+                <div class="p-4 border-b border-slate-700">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <i data-lucide="crosshair" class="w-3 h-3"></i> Select Map
+                    </h2>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 pb-20 pb-safe">
+                    <div id="mapList" class="space-y-1">
+                        <!-- JSで生成 -->
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- オーバーレイ -->
+        <div id="overlay" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+        <!-- ========================================== -->
+        <!-- メインコンテンツ -->
+        <!-- ========================================== -->
+        <main class="flex-1 flex flex-col relative w-full h-full bg-slate-900">
+            
+            <!-- マップビューポート (画像表示エリア) -->
+            <div id="viewport" class="map-viewport touch-action-none">
+                <div id="mapTransformLayer">
+                    <img id="mapImage" src="" alt="Map Setup" class="max-w-none w-auto h-auto max-h-[90%] object-contain shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none">
+                </div>
+                
+                <!-- ロード中 -->
+                <div id="loading" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-10">
+                    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-500 mb-3"></div>
+                    <span class="text-xs text-slate-400 font-mono animate-pulse">LOADING TACTICAL DATA...</span>
+                </div>
+
+                <!-- セットアップ案内 -->
+                <div id="infoMessage" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-sm bg-slate-800/95 backdrop-blur text-sm p-5 rounded-xl border border-yellow-500/30 text-slate-300 text-center hidden shadow-2xl z-20">
+                    <div class="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="image" class="w-5 h-5 text-yellow-500"></i>
+                    </div>
+                    <h3 class="font-bold text-white mb-2">セットアップモード</h3>
+                    <p class="text-xs leading-relaxed text-slate-400">
+                        コード内の <code>MAP_DATA</code> を編集し、<br>自作の画像URLに差し替えてください。
+                    </p>
+                </div>
+            </div>
+
+            <!-- フローティングUI (マップ上に重ねて表示) -->
+            <!-- pb-safe を追加してホームバーと被らないようにする -->
+            <div class="absolute inset-x-0 bottom-0 pointer-events-none p-4 pb-safe flex flex-col gap-3 z-20 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent">
+                
+                <!-- マップ情報ラベル -->
+                <div class="absolute top-4 left-4 pointer-events-auto">
+                    <div class="bg-slate-800/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg flex items-center gap-2">
+                        <span id="labelMapName" class="font-bold text-sm text-white">Map</span>
+                        <div class="w-px h-3 bg-slate-600"></div>
+                        <span id="labelSide" class="text-xs text-slate-300 font-mono">SIDE</span>
+                    </div>
+                </div>
+
+                <!-- ズームコントロール (右側) -->
+                <div class="absolute top-4 right-4 flex flex-col gap-2 pointer-events-auto">
+                    <button onclick="handleZoomIn()" class="w-10 h-10 bg-slate-800/90 backdrop-blur border border-slate-600 rounded-lg flex items-center justify-center text-white shadow-lg active:bg-slate-700 active:scale-95 transition-all">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="handleZoomOut()" class="w-10 h-10 bg-slate-800/90 backdrop-blur border border-slate-600 rounded-lg flex items-center justify-center text-white shadow-lg active:bg-slate-700 active:scale-95 transition-all">
+                        <i data-lucide="minus" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="resetView()" class="w-10 h-10 bg-slate-800/90 backdrop-blur border border-slate-600 rounded-lg flex items-center justify-center text-white shadow-lg active:bg-slate-700 active:scale-95 transition-all" title="Reset View">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- 攻守切り替えスイッチ (下部中央) -->
+                <!-- margin-bottom を少し追加して、操作しやすく -->
+                <div class="w-full max-w-md mx-auto pointer-events-auto mb-2">
+                    <div class="bg-slate-800/90 backdrop-blur p-1 rounded-xl border border-slate-700 shadow-xl flex relative">
+                        <!-- スライディング背景 -->
+                        <div id="switchBg" class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-red-500 rounded-lg transition-all duration-300 ease-out shadow-md"></div>
+                        
+                        <button onclick="setSide('ATTACK')" id="btnAttack" class="relative flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 z-10 transition-colors duration-200 text-white">
+                            <i data-lucide="sword" class="w-4 h-4"></i>
+                            <span>ATTACK</span>
+                        </button>
+                        <button onclick="setSide('DEFENSE')" id="btnDefense" class="relative flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 z-10 transition-colors duration-200 text-slate-400 hover:text-white">
+                            <i data-lucide="shield" class="w-4 h-4"></i>
+                            <span>DEFENSE</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- アプリのロジック (JavaScript) -->
+    <!-- ========================================== -->
+    <script>
+        /**
+         * ▼▼▼ 設定エリア ▼▼▼
+         */
+        const MAP_DATA = {
+            Ascent: { id: "ascent", name: "アセント", attackUrl: "https://i.imgur.com/F7iGqwg.png", defenseUrl: "https://i.imgur.com/fUmWl7X.png" },
+            Bind: { id: "bind", name: "バインド", attackUrl: "https://i.imgur.com/rhA4cTV.png", defenseUrl: "https://i.imgur.com/ymzMmix.png" },
+            Haven: { id: "haven", name: "ヘイヴン", attackUrl: "https://i.imgur.com/prhVQyX.png", defenseUrl: "https://i.imgur.com/kMZ8Lw8.png" },
+            Split: { id: "split", name: "スプリット", attackUrl: "https://i.imgur.com/tXtzM92.png", defenseUrl: "https://i.imgur.com/05kssln.png" },
+            Lotus: { id: "lotus", name: "ロータス", attackUrl: "https://i.imgur.com/qTmCQnn.png", defenseUrl: "https://i.imgur.com/Ip4KFDJ.png" },
+            Sunset: { id: "sunset", name: "サンセット", attackUrl: "https://i.imgur.com/WwTsgbw.png", defenseUrl: "https://i.imgur.com/SUeEWrh.png" },
+            Pearl: { id: "pearl", name: "パール", attackUrl: "https://i.imgur.com/3B9STc7.png", defenseUrl: "https://i.imgur.com/J61iybE.png" },
+            Fracture: { id: "fracture", name: "フラクチャー", attackUrl: "https://i.imgur.com/yVcX6R8.png", defenseUrl: "https://i.imgur.com/XikMFT9.png" },
+            Breeze: { id: "breeze", name: "ブリーズ", attackUrl: "https://i.imgur.com/B5zbMRA.png", defenseUrl: "https://i.imgur.com/EkF2goF.png" },
+            Icebox: { id: "icebox", name: "アイスボックス", attackUrl: "https://i.imgur.com/tLamk9u.png", defenseUrl: "https://i.imgur.com/OuOk6zK.png" },
+            Abyss: { id: "abyss", name: "アビス", attackUrl: "https://i.imgur.com/Hb9DnB7.png", defenseUrl: "https://i.imgur.com/xEHdUeF.png" }
+        };
+
+        // ▼ 状態管理
+        let currentMap = 'Ascent';
+        let currentSide = 'ATTACK';
+        let isMenuOpen = false;
+
+        // ▼ ズーム/パン用の変数
+        let scale = 1;
+        let pX = 0;
+        let pY = 0;
+        let isDragging = false;
+        let startX, startY;
+        const MIN_SCALE = 1; // 縮小限界
+        const MAX_SCALE = 4; // 拡大限界
+
+        // ▼ DOM要素
+        const elements = {
+            mapList: document.getElementById('mapList'),
+            mapImage: document.getElementById('mapImage'),
+            layer: document.getElementById('mapTransformLayer'),
+            viewport: document.getElementById('viewport'),
+            sidebar: document.getElementById('sidebar'),
+            menuBtn: document.getElementById('menuBtn'),
+            overlay: document.getElementById('overlay'),
+            labelMap: document.getElementById('labelMapName'),
+            labelSide: document.getElementById('labelSide'),
+            btnAttack: document.getElementById('btnAttack'),
+            btnDefense: document.getElementById('btnDefense'),
+            switchBg: document.getElementById('switchBg'),
+            loading: document.getElementById('loading'),
+            info: document.getElementById('infoMessage')
+        };
+
+        // ▼ 初期化
+        function init() {
+            renderMapList();
+            updateDisplay();
+            setupInteractions();
+            lucide.createIcons();
+        }
+
+        // ▼ マップリスト描画
+        function renderMapList() {
+            elements.mapList.innerHTML = '';
+            
+            // 日本語名で50音順にソートして表示
+            Object.keys(MAP_DATA)
+                .sort((keyA, keyB) => MAP_DATA[keyA].name.localeCompare(MAP_DATA[keyB].name, 'ja'))
+                .forEach(key => {
+                    const map = MAP_DATA[key];
+                    const isActive = key === currentMap;
+                    const btn = document.createElement('button');
+                    
+                    btn.className = `w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-between mb-1 group ${
+                        isActive 
+                        ? 'bg-gradient-to-r from-red-500/20 to-transparent text-red-400 border-l-2 border-red-500' 
+                        : 'text-slate-400 hover:bg-slate-700 hover:text-slate-200 border-l-2 border-transparent'
+                    }`;
+
+                    btn.innerHTML = `
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="${isActive ? 'map-pin' : 'circle'}" class="w-3 h-3 ${isActive ? 'fill-red-500' : ''}"></i>
+                            ${map.name}
+                        </span>
+                        ${isActive ? '<i data-lucide="chevron-right" class="w-4 h-4 text-red-500"></i>' : ''}
+                    `;
+                    btn.onclick = () => {
+                        currentMap = key;
+                        renderMapList();
+                        updateDisplay();
+                        closeMenu();
+                        lucide.createIcons();
+                    };
+                    elements.mapList.appendChild(btn);
+                });
+        }
+
+        // ▼ 表示更新
+        function updateDisplay() {
+            const map = MAP_DATA[currentMap];
+            const url = currentSide === 'ATTACK' ? map.attackUrl : map.defenseUrl;
+
+            // テキスト更新
+            elements.labelMap.textContent = map.name;
+            elements.labelSide.textContent = currentSide === 'ATTACK' ? 'ATTACK SIDE' : 'DEFENSE SIDE';
+
+            // スイッチアニメーション
+            if (currentSide === 'ATTACK') {
+                elements.switchBg.style.transform = 'translateX(0)';
+                elements.switchBg.className = "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-red-500 rounded-lg transition-all duration-300 ease-out shadow-md left-1";
+                elements.btnAttack.classList.replace('text-slate-400', 'text-white');
+                elements.btnDefense.classList.replace('text-white', 'text-slate-400');
+            } else {
+                elements.switchBg.style.transform = 'translateX(100%) translateX(8px)'; // 微調整
+                elements.switchBg.className = "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-teal-600 rounded-lg transition-all duration-300 ease-out shadow-md left-0";
+                elements.btnAttack.classList.replace('text-white', 'text-slate-400');
+                elements.btnDefense.classList.replace('text-slate-400', 'text-white');
+            }
+
+            // 画像読み込み
+            elements.loading.style.display = 'flex';
+            elements.mapImage.style.opacity = '0';
+            
+            // マップ変更時はズームリセット
+            resetView();
+
+            const img = new Image();
+            img.onload = () => {
+                elements.mapImage.src = url;
+                elements.loading.style.display = 'none';
+                elements.mapImage.style.opacity = '1';
+                
+                if (url.includes('valorant-api.com')) {
+                    elements.info.classList.remove('hidden');
+                } else {
+                    elements.info.classList.add('hidden');
+                }
+            };
+            img.onerror = () => {
+                elements.loading.style.display = 'none';
+                elements.mapImage.src = "https://placehold.co/800x600/1e293b/94a3b8?text=No+Image&font=sans-serif";
+                elements.mapImage.style.opacity = '1';
+            };
+            img.src = url;
+        }
+
+        // ▼ 攻守切り替え
+        window.setSide = (side) => {
+            if (currentSide === side) return;
+            currentSide = side;
+            updateDisplay();
+        };
+
+        // ▼ メニュー制御
+        function openMenu() {
+            isMenuOpen = true;
+            elements.sidebar.classList.remove('-translate-x-full');
+            elements.overlay.classList.remove('hidden');
+            setTimeout(() => elements.overlay.classList.remove('opacity-0'), 10);
+        }
+
+        function closeMenu() {
+            isMenuOpen = false;
+            elements.sidebar.classList.add('-translate-x-full');
+            elements.overlay.classList.add('opacity-0');
+            setTimeout(() => elements.overlay.classList.add('hidden'), 300);
+        }
+
+        elements.menuBtn.onclick = () => isMenuOpen ? closeMenu() : openMenu();
+        elements.overlay.onclick = closeMenu;
+
+        // ▼▼▼ ズーム・パン機能の実装 ▼▼▼
+
+        function applyTransform() {
+            // 境界制限（簡易）: 画像が極端に画面外に行かないように
+            const limit = (scale * 500); 
+            // 厳密な境界計算は複雑なので、ユーザーが戻せる程度に緩く制限
+            
+            elements.layer.style.transform = `translate(${pX}px, ${pY}px) scale(${scale})`;
+        }
+
+        window.handleZoomIn = () => {
+            scale = Math.min(scale + 0.5, MAX_SCALE);
+            applyTransform();
+        };
+
+        window.handleZoomOut = () => {
+            scale = Math.max(scale - 0.5, MIN_SCALE);
+            if (scale === MIN_SCALE) { pX = 0; pY = 0; } // 最小に戻ったら位置もリセット
+            applyTransform();
+        };
+
+        window.resetView = () => {
+            scale = 1;
+            pX = 0;
+            pY = 0;
+            applyTransform();
+        };
+
+        function setupInteractions() {
+            const vp = elements.viewport;
+
+            // --- マウス操作 ---
+            vp.addEventListener('mousedown', e => {
+                if (scale === 1) return; // 等倍時はドラッグ無効（UX向上のため）
+                isDragging = true;
+                startX = e.clientX - pX;
+                startY = e.clientY - pY;
+                vp.style.cursor = 'grabbing';
+            });
+
+            window.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                e.preventDefault();
+                pX = e.clientX - startX;
+                pY = e.clientY - startY;
+                requestAnimationFrame(applyTransform);
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                vp.style.cursor = scale > 1 ? 'grab' : 'default';
+            });
+
+            // ホイールズーム
+            vp.addEventListener('wheel', e => {
+                e.preventDefault();
+                const delta = -Math.sign(e.deltaY) * 0.2;
+                const newScale = Math.min(Math.max(scale + delta, MIN_SCALE), MAX_SCALE);
+                
+                if (newScale !== scale) {
+                    scale = newScale;
+                    if (scale === MIN_SCALE) { pX = 0; pY = 0; }
+                    applyTransform();
+                }
+            }, { passive: false });
+
+
+            // --- タッチ操作（パンのみ、ピンチは簡易対応したいが複雑さを避けるためボタン推奨） ---
+            // ※本格的なピンチイン・アウトを実装するにはコード量が増えるため、今回は「1本指ドラッグ」と「ボタンズーム」の構成にします。
+            
+            vp.addEventListener('touchstart', e => {
+                if (e.touches.length === 1 && scale > 1) {
+                    isDragging = true;
+                    startX = e.touches[0].clientX - pX;
+                    startY = e.touches[0].clientY - pY;
+                }
+                // ダブルタップ判定
+                if (e.touches.length === 1) {
+                    const now = new Date().getTime();
+                    const timeSince = now - (this.lastTouch || 0);
+                    if (timeSince < 300 && timeSince > 0) {
+                        // Double tap detected
+                        resetView();
+                    }
+                    this.lastTouch = now;
+                }
+            }, { passive: false });
+
+            vp.addEventListener('touchmove', e => {
+                if (!isDragging) return;
+                e.preventDefault(); // スクロール防止
+                pX = e.touches[0].clientX - startX;
+                pY = e.touches[0].clientY - startY;
+                requestAnimationFrame(applyTransform);
+            }, { passive: false });
+
+            vp.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+
+        // 初期化実行
+        init();
+
+    </script>
+</body>
+</html>
