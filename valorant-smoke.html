@@ -130,8 +130,9 @@
                     </div>
                 </div>
 
-                <!-- ズームボタン (フローティング: フッターのすぐ上に配置) -->
-                <div class="absolute bottom-4 right-4 flex flex-col gap-2 pointer-events-auto">
+                <!-- ズームボタン (フローティング: フッターの上に配置) -->
+                <!-- bottom-24 に変更して、固定フッターと重ならないように調整 -->
+                <div class="absolute bottom-24 right-4 flex flex-col gap-2 pointer-events-auto z-40">
                     <button onclick="handleZoomIn()" class="w-10 h-10 bg-slate-800/80 backdrop-blur border border-slate-600 rounded-lg flex items-center justify-center text-white shadow-lg active:bg-slate-700 active:scale-95 transition-all">
                         <i data-lucide="plus" class="w-5 h-5"></i>
                     </button>
@@ -149,7 +150,8 @@
         <!-- ========================================== -->
         <!-- 3. フッターエリア (攻守切り替えスイッチ) -->
         <!-- ========================================== -->
-        <footer class="flex-none bg-slate-800 border-t border-slate-700 px-4 py-3 pb-safe z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
+        <!-- fixed bottom-0 を追加して、画面最下部に強制固定 -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
             <div class="w-full max-w-md mx-auto">
                 <div class="bg-slate-900 p-1 rounded-lg border border-slate-600 shadow-inner flex relative h-12">
                     <div id="switchBg" class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-red-500 rounded-md transition-all duration-300 ease-out shadow-md left-1"></div>
