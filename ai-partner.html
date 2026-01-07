@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI STREAM PARTNER | PROJECT REPORT</title>
-    
+
     <!-- SEO & OGP Settings -->
     <meta name="description" content="AI配信パートナーシステムの開発レポート。Gemini APIを活用し、配信コメントにリアルタイムで反応する相棒AIの実装詳細。">
     <meta property="og:title" content="AI STREAM PARTNER | HOSHII EIMU">
@@ -17,215 +18,39 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://eimu-hoshii.github.io/favicon.ico">
     <link rel="apple-touch-icon" href="https://eimu-hoshii.github.io/apple-touch-icon.png">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
-     
-    <style>
-        /* * PROJECT PAGE STYLESHEET
-         * Theme: Cyberpunk / Military Terminal
-         * Note: index.htmlと共通のデザイン設定です
-         */
+    <link
+        href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap"
+        rel="stylesheet">
 
-        :root {
-            --bg-color: #050508;
-            --panel-bg: rgba(10, 10, 20, 0.85);
-            --main-text: #a0a0c0;
-            --accent-pink: #ff40b0;
-            --accent-purple: #8a2be2;
-            --terminal-green: #00ff41;
-            --grid-line: rgba(138, 43, 226, 0.15);
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            background-image: 
-                linear-gradient(var(--grid-line) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 40px 40px;
-            color: var(--main-text);
-            font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', monospace;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* 走査線エフェクト */
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 999;
-        }
-
-        .container {
-            max-width: 800px; /* 読みやすいように少し幅を狭く */
-            margin: 0 auto;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ヘッダー簡易版 */
-        header {
-            border-bottom: 1px solid var(--accent-purple);
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        h1 {
-            color: #fff;
-            margin: 0;
-            font-size: 2rem;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 0px var(--accent-purple);
-        }
-
-        .breadcrumb {
-            color: var(--terminal-green);
-            font-size: 0.9rem;
-        }
-
-        /* 記事コンテンツエリア */
-        .content-panel {
-            background: var(--panel-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            margin-bottom: 40px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
-            /* 角を切り落とす */
-            clip-path: polygon(
-                20px 0, 100% 0, 
-                100% calc(100% - 20px), calc(100% - 20px) 100%, 
-                0 100%, 0 20px
-            );
-        }
-
-        /* コンテンツ内のスタイル */
-        .content-panel h2 {
-            color: var(--accent-pink);
-            border-left: 4px solid var(--accent-pink);
-            padding-left: 15px;
-            margin-top: 40px;
-            margin-bottom: 20px;
-        }
-        .content-panel h3 {
-            color: var(--terminal-green);
-            margin-top: 30px;
-            margin-bottom: 10px;
-            font-family: 'Share Tech Mono';
-        }
-        .content-panel h2:first-child { margin-top: 0; }
-
-        .content-panel p {
-            line-height: 1.8;
-            margin-bottom: 20px;
-        }
-
-        .content-panel img {
-            max-width: 100%;
-            border: 1px solid var(--accent-purple);
-            margin: 20px 0;
-            display: block;
-        }
-
-        .tech-stack {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .tag {
-            background: rgba(0, 255, 65, 0.1);
-            border: 1px solid var(--terminal-green);
-            color: var(--terminal-green);
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            font-family: 'Share Tech Mono';
-        }
-
-        /* GitHubボタン */
-        .github-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #161b22; /* GitHub Dark Color */
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 25px;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            font-family: 'Share Tech Mono', monospace;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        .github-btn:hover {
-            background: #30363d;
-            border-color: #8b949e;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-        .github-icon {
-            font-weight: bold;
-            color: var(--terminal-green);
-        }
-
-        /* 戻るボタン */
-        .back-btn {
-            display: inline-block;
-            color: #fff;
-            text-decoration: none;
-            border: 1px solid var(--accent-purple);
-            padding: 10px 30px;
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            font-family: 'Share Tech Mono';
-        }
-
-        .back-btn:hover {
-            background: var(--accent-pink);
-            color: #000;
-            box-shadow: 0 0 15px var(--accent-pink);
-        }
-
-        footer {
-            text-align: center;
-            opacity: 0.6;
-            font-size: 0.8rem;
-            margin-top: 60px;
-            border-top: 1px solid #333;
-            padding-top: 20px;
-        }
-    </style>
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
-    <div class="container">
-        
+<body>
+    <!-- Cursor -->
+    <div id="cursor-main"></div>
+    <div id="cursor-ring"></div>
+
+    <div class="container" style="max-width: 900px;">
+
         <header>
-            <div>
-                <div class="breadcrumb">> ROOT / EIMU'S LAB / REPORT</div>
-                <h1>AI STREAM PARTNER</h1>
-            </div>
-            <div style="font-family: 'Share Tech Mono'; color: var(--accent-purple);">
-                ID: 01
+            <div style="text-align: left; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <div class="breadcrumb">> ROOT / EIMU'S LAB / REPORT</div>
+                    <h1 style="font-size: 2.5rem; text-align: left;">AI STREAM PARTNER</h1>
+                </div>
+                <div style="font-family: 'Share Tech Mono'; color: var(--neon-purple);">
+                    ID: 01
+                </div>
             </div>
         </header>
 
-        <main class="content-panel">
-            
+        <main class="panel">
+
             <!-- 使用技術タグ -->
             <div class="tech-stack">
                 <span class="tag">Gemini API</span>
@@ -263,17 +88,18 @@
             </p>
 
             <!-- GitHub Link Section -->
-            <hr style="border-color: rgba(255,255,255,0.1); margin: 40px 0;">
+            <hr style="border-color: var(--glass-border); margin: 40px 0;">
             <h3>>> ACCESS SOURCE CODE</h3>
             <p>本プロジェクトのソースコードはGitHubにて公開しています。</p>
             <a href="https://github.com/eimu-hoshii/AI-Streaming-Partner" target="_blank" class="github-btn">
-                <span class="github-icon">/></span> View on GitHub
+                <span>/></span> View on GitHub
             </a>
 
         </main>
 
         <div style="text-align: center;">
-            <a href="index.html" class="back-btn"><< RETURN TO COMMAND CENTER</a>
+            <a href="index.html" class="back-btn">
+                << RETURN TO COMMAND CENTER</a>
         </div>
 
         <footer>
@@ -282,5 +108,28 @@
 
     </div>
 
+    <!-- Cursor Script -->
+    <script>
+        const cursorMain = document.getElementById('cursor-main');
+        const cursorRing = document.getElementById('cursor-ring');
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        if (!isTouchDevice) {
+            window.addEventListener('mousemove', (e) => {
+                cursorMain.style.left = e.clientX + 'px';
+                cursorMain.style.top = e.clientY + 'px';
+                setTimeout(() => {
+                    cursorRing.style.left = e.clientX + 'px';
+                    cursorRing.style.top = e.clientY + 'px';
+                }, 50);
+            });
+            const interactables = document.querySelectorAll('a, button');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            });
+        }
+    </script>
 </body>
+
 </html>

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEAR LIST | HOSHII EIMU</title>
-    
+
     <!-- SEO & OGP Settings -->
     <meta name="description" content="星井詠夢の使用機材・デバイスリスト。配信環境、PCスペック、周辺機器の詳細構成。">
     <meta property="og:title" content="GEAR LIST | HOSHII EIMU">
@@ -21,217 +22,38 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        /* * GEAR PAGE STYLESHEET
-         * Theme: Cyberpunk / Military Terminal
-         */
+    <link
+        href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap"
+        rel="stylesheet">
 
-        :root {
-            --bg-color: #050508;
-            --panel-bg: rgba(10, 10, 20, 0.85);
-            --main-text: #a0a0c0;
-            --accent-pink: #ff40b0;
-            --accent-purple: #8a2be2;
-            --terminal-green: #00ff41;
-            --grid-line: rgba(138, 43, 226, 0.15);
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            background-image: 
-                linear-gradient(var(--grid-line) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 40px 40px;
-            color: var(--main-text);
-            font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', monospace;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 999;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        header {
-            border-bottom: 1px solid var(--accent-purple);
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        h1 {
-            color: #fff;
-            margin: 0;
-            font-size: 2rem;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 0px var(--accent-purple);
-        }
-
-        .breadcrumb {
-            color: var(--terminal-green);
-            font-size: 0.9rem;
-        }
-
-        /* カテゴリセクション */
-        .gear-section {
-            background: var(--panel-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-            position: relative;
-            /* 左上の角をカット */
-            clip-path: polygon(20px 0, 100% 0, 100% 100%, 0 100%, 0 20px);
-            border-left: 4px solid var(--accent-pink);
-        }
-
-        .gear-section h2 {
-            color: #fff;
-            font-family: 'Share Tech Mono';
-            font-size: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 10px;
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .gear-section h2::before {
-            content: ">>";
-            color: var(--terminal-green);
-        }
-
-        /* アイテムリスト */
-        .gear-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .gear-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--accent-purple);
-            padding: 15px;
-            transition: all 0.3s ease;
-        }
-        .gear-item:hover {
-            border-color: var(--terminal-green);
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .category-label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--accent-pink);
-            font-family: 'Share Tech Mono';
-            margin-bottom: 5px;
-        }
-
-        .item-name {
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 10px;
-            display: block;
-            font-size: 1rem;
-        }
-
-        .spec-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 10px 0;
-            font-size: 0.85rem;
-            color: #ccc;
-        }
-        .spec-list li::before {
-            content: "- ";
-            color: var(--terminal-green);
-        }
-
-        /* Amazonリンクボタン */
-        .amazon-btn {
-            display: inline-block;
-            font-size: 0.8rem;
-            color: #ff9900; /* Amazon Color */
-            text-decoration: none;
-            border: 1px solid #ff9900;
-            padding: 5px 10px;
-            transition: all 0.2s;
-            font-family: 'Share Tech Mono';
-        }
-        .amazon-btn:hover {
-            background: #ff9900;
-            color: #000;
-        }
-
-        .back-btn {
-            display: inline-block;
-            color: #fff;
-            text-decoration: none;
-            border: 1px solid var(--accent-purple);
-            padding: 10px 30px;
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-            font-family: 'Share Tech Mono';
-        }
-        .back-btn:hover {
-            background: var(--accent-pink);
-            color: #000;
-            box-shadow: 0 0 15px var(--accent-pink);
-        }
-
-        footer {
-            text-align: center;
-            opacity: 0.6;
-            font-size: 0.8rem;
-            margin-top: 60px;
-            border-top: 1px solid #333;
-            padding-top: 20px;
-        }
-    </style>
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
-    <div class="container">
-        
+<body>
+    <!-- Cursor -->
+    <div id="cursor-main"></div>
+    <div id="cursor-ring"></div>
+
+    <div class="container" style="max-width: 900px;">
+
         <header>
-            <div>
-                <div class="breadcrumb">> ROOT / DEPLOYMENT / GEAR</div>
-                <h1>GEAR LIST</h1>
-            </div>
-            <div style="font-family: 'Share Tech Mono'; color: var(--accent-purple);">
-                ID: 04
+            <div style="text-align: left; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <div class="breadcrumb">> ROOT / DEPLOYMENT / GEAR</div>
+                    <h1 style="font-size: 2.5rem; text-align: left;">GEAR LIST</h1>
+                </div>
+                <div style="font-family: 'Share Tech Mono'; color: var(--neon-purple);">
+                    ID: 04
+                </div>
             </div>
         </header>
 
         <!-- Audio Section -->
-        <section class="gear-section">
-            <h2>AUDIO SYSTEM <span style="font-size:0.8em; opacity:0.5; margin-left:auto;">/// SOUND_OPS</span></h2>
+        <section class="panel">
+            <h2>AUDIO SYSTEM <span class="deco">/// SOUND_OPS</span></h2>
             <div class="gear-grid">
-                
+
                 <div class="gear-item">
                     <span class="category-label">MICROPHONE</span>
                     <span class="item-name">Shure SM7B</span>
@@ -260,10 +82,10 @@
         </section>
 
         <!-- Peripherals Section -->
-        <section class="gear-section" style="border-left-color: var(--terminal-green);">
-            <h2>PERIPHERALS <span style="font-size:0.8em; opacity:0.5; margin-left:auto;">/// INPUT_DEVICES</span></h2>
+        <section class="panel">
+            <h2>PERIPHERALS <span class="deco">/// INPUT_DEVICES</span></h2>
             <div class="gear-grid">
-                
+
                 <div class="gear-item">
                     <span class="category-label">MOUSE (MAIN)</span>
                     <span class="item-name">Logicool G502 X PLUS LIGHTSPEED</span>
@@ -298,10 +120,10 @@
         </section>
 
         <!-- PC Specs Section -->
-        <section class="gear-section" style="border-left-color: var(--accent-purple);">
-            <h2>SYSTEM SPECS <span style="font-size:0.8em; opacity:0.5; margin-left:auto;">/// HARDWARE</span></h2>
+        <section class="panel">
+            <h2>SYSTEM SPECS <span class="deco">/// HARDWARE</span></h2>
             <div class="gear-grid">
-                
+
                 <div class="gear-item">
                     <span class="category-label">MAIN PC (CUSTOM BUILD)</span>
                     <span class="item-name">自作PC (寄せ集め号)</span>
@@ -329,7 +151,8 @@
         </section>
 
         <div style="text-align: center;">
-            <a href="index.html" class="back-btn"><< RETURN TO COMMAND CENTER</a>
+            <a href="index.html" class="back-btn">
+                << RETURN TO COMMAND CENTER</a>
         </div>
 
         <footer>
@@ -338,5 +161,28 @@
 
     </div>
 
+    <!-- Cursor Script -->
+    <script>
+        const cursorMain = document.getElementById('cursor-main');
+        const cursorRing = document.getElementById('cursor-ring');
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        if (!isTouchDevice) {
+            window.addEventListener('mousemove', (e) => {
+                cursorMain.style.left = e.clientX + 'px';
+                cursorMain.style.top = e.clientY + 'px';
+                setTimeout(() => {
+                    cursorRing.style.left = e.clientX + 'px';
+                    cursorRing.style.top = e.clientY + 'px';
+                }, 50);
+            });
+            const interactables = document.querySelectorAll('a, button');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            });
+        }
+    </script>
 </body>
+
 </html>
