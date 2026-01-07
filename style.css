@@ -1,21 +1,57 @@
-/* COMMAND CENTER STYLESHEET
-  Theme: Cyberpunk / Military Terminal
+/* COMMAND CENTER STYLESHEET v4.0 (REDUX)
+   Theme: High-Tech Cyberpunk / Holo-Glass Interface
+   Optimized for: Performance & Visual Impact
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@400;700&family=Orbitron:wght@500;700&display=swap');
 
 :root {
-    --bg-color: #050508;
-    --panel-bg: rgba(20, 20, 35, 0.7);
-    --main-text: #a0a0c0;
-    --accent-pink: #ff40b0; /* 詠夢ピンク */
-    --accent-purple: #8a2be2;
-    --terminal-green: #00ff41;
-    --grid-line: rgba(255, 64, 176, 0.1);
+    /* Color Palette */
+    --bg-color: #030305;
+    --bg-gradient: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #030305 100%);
+    
+    --glass-bg: rgba(16, 16, 28, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.05);
+    
+    --main-text: #c0c0e0;
+    --head-text: #ffffff;
+    
+    /* Neon Colors */
+    --neon-pink: #ff2a6d;
+    --neon-purple: #bd00ff;
+    --neon-blue: #05d9e8;
+    --neon-green: #00ff41;
+    
+    /* Effects */
+    --glow-text: 0 0 10px rgba(255, 42, 109, 0.5), 0 0 20px rgba(255, 42, 109, 0.3);
+    --glow-border: 0 0 8px rgba(5, 217, 232, 0.4);
+    
+    --scanline-color: rgba(0, 0, 0, 0.5);
 }
 
 * {
     box-sizing: border-box;
+    cursor: none; /* Custom cursor required */
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-purple) var(--bg-color);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--neon-purple);
+    border-radius: 3px;
+    box-shadow: 0 0 10px var(--neon-purple);
 }
 
 body {
@@ -23,184 +59,465 @@ body {
     padding: 0;
     background-color: var(--bg-color);
     background-image: 
-        linear-gradient(var(--grid-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-    background-size: 30px 30px; /* グリッド背景 */
+        linear-gradient(rgba(5, 217, 232, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(5, 217, 232, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
     color: var(--main-text);
-    font-family: 'Share Tech Mono', 'Zen Kaku Gothic New', monospace;
+    font-family: 'Zen Kaku Gothic New', sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
 }
 
-/* CRTモニター風の走査線エフェクト */
+/* Vignette & Scanlines */
 body::after {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
-        transparent 1px,
-        transparent 2px
-    );
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: 
+        radial-gradient(circle, transparent 60%, black 100%),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
     pointer-events: none;
-    z-index: 999;
+    z-index: 900;
 }
 
+/* --- Typography --- */
+h1, h2, h3, .mono-font {
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+}
+
+a {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- Layout --- */
 .container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     position: relative;
     z-index: 1;
 }
 
-/* ヘッダー周り */
+/* --- Header Section --- */
 header {
     text-align: center;
-    padding: 40px 0 20px;
-    margin-bottom: 20px;
+    padding: 80px 0 40px;
+    position: relative;
 }
 
 h1 {
-    font-size: 3rem;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 4px;
+    font-family: 'Orbitron', 'Share Tech Mono', sans-serif;
+    font-size: 4.5rem;
+    color: var(--head-text);
     margin: 0;
+    line-height: 1;
+    letter-spacing: 0.1em;
     text-shadow: 
-        2px 2px 0px var(--accent-purple),
-        -2px -2px 0px var(--accent-pink);
-    animation: glitch 1s infinite alternate;
+        3px 3px 0px var(--neon-purple),
+        -3px -3px 0px var(--neon-pink);
+    position: relative;
+    display: inline-block;
+}
+
+h1::after {
+    content: attr(data-text); /* Requires data-text attribute in HTML */
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    filter: blur(15px);
+    opacity: 0.7;
+    background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .subtitle {
     font-size: 1.2rem;
-    color: var(--accent-pink);
-    letter-spacing: 2px;
+    color: var(--neon-blue);
+    letter-spacing: 4px;
+    margin-top: 10px;
+    text-shadow: 0 0 10px var(--neon-blue);
 }
 
-/* メインレイアウト */
-.main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-}
-
-@media (max-width: 768px) {
-    .main-grid {
-        grid-template-columns: 1fr; /* スマホでは縦並び */
-    }
-    h1 {
-        font-size: 2rem;
-    }
-}
-
-/* 立ち絵エリア */
-.chara-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-.chara-img {
-    width: 100%;
-    max-width: 400px;
-    height: auto;
-    filter: drop-shadow(0 0 15px rgba(255, 64, 176, 0.4));
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-    transition: transform 0.3s ease;
-}
-
-.chara-img:hover {
-    transform: scale(1.02);
-}
-
-/* 情報パネル（ガラス風デザイン） */
+/* --- Glass Panels --- */
 .panel {
-    background: var(--panel-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-left: 4px solid var(--accent-pink);
-    padding: 25px;
-    margin-bottom: 20px;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    border-radius: 4px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 30px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Corner Accents */
+.panel::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--neon-pink), transparent);
+    opacity: 0.7;
 }
 
 .panel h2 {
-    color: #fff;
-    border-bottom: 1px solid var(--accent-purple);
-    padding-bottom: 10px;
+    color: var(--head-text);
+    font-size: 1.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
     margin-top: 0;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
 }
 
-.panel h2::before {
-    content: ">>";
-    color: var(--accent-pink);
-    font-size: 0.8em;
+.panel h2 span.deco {
+    font-size: 0.9rem;
+    color: var(--neon-green);
+    opacity: 0.8;
 }
 
-/* リンクボタン */
-.link-list {
-    list-style: none;
-    padding: 0;
+/* --- Grid Layout --- */
+.main-grid {
+    display: grid;
+    grid-template-columns: 4fr 6fr;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+@media (max-width: 900px) {
+    .main-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 2.5rem; }
+    .left-column { order: -1; }
+    
+    /* Mobile Cursor Reset */
+    * { cursor: auto; }
+    #cursor-main, #cursor-ring { display: none !important; }
+}
+
+/* --- Character Section --- */
+.chara-section {
+    position: relative;
+    min-height: 450px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Hologram base */
+    background: radial-gradient(ellipse at bottom, rgba(189, 0, 255, 0.2) 0%, transparent 70%);
+}
+
+.chara-bg-circle {
+    position: absolute;
+    width: 350px; height: 350px;
+    border: 1px dashed var(--neon-purple);
+    border-radius: 50%;
+    animation: rotateCircle 20s linear infinite;
+    opacity: 0.4;
+}
+
+@keyframes rotateCircle { 100% { transform: rotate(360deg); } }
+
+.chara-img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 15px rgba(189, 0, 255, 0.3));
+    mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.chara-img:hover {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 25px rgba(189, 0, 255, 0.6)) brightness(1.1);
+}
+
+/* --- Button / Links --- */
+.link-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
 }
 
 .link-btn {
-    display: block;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 15px;
-    margin: 10px 0;
-    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px 24px;
+    color: var(--head-text);
     text-decoration: none;
-    border: 1px solid var(--accent-purple);
-    transition: all 0.3s ease;
-    text-align: center;
-    font-weight: bold;
-    letter-spacing: 1px;
+    border: 1px solid var(--neon-purple);
+    border-radius: 4px;
+    transition: all 0.25s ease;
+    font-family: 'Share Tech Mono';
+    position: relative;
+    overflow: hidden;
+}
+
+.link-btn::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 42, 109, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.link-btn:hover::before {
+    left: 100%;
 }
 
 .link-btn:hover {
-    background: var(--accent-pink);
-    color: #000;
-    box-shadow: 0 0 15px var(--accent-pink);
-    transform: translateX(5px);
+    background: rgba(255, 42, 109, 0.1);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 20px rgba(255, 42, 109, 0.3);
+    transform: translateY(-2px);
 }
 
-/* 点滅カーソル */
-.blinking-cursor::after {
-    content: "_";
-    animation: blink 1s step-end infinite;
+/* --- Navigation --- */
+.nav-container {
+    position: sticky;
+    top: 20px;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    pointer-events: none; /* Let clicks pass through around it */
 }
 
-@keyframes blink {
-    50% { opacity: 0; }
+.nav-menu {
+    background: rgba(5, 5, 8, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    padding: 10px 30px;
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    pointer-events: auto; /* Re-enable clicks */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-@keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
+.nav-item a {
+    color: var(--main-text);
+    text-decoration: none;
+    font-family: 'Share Tech Mono';
+    font-weight: bold;
+    font-size: 0.9rem;
+    position: relative;
 }
 
-/* フッター */
+.nav-item a:hover {
+    color: var(--neon-blue);
+    text-shadow: 0 0 8px var(--neon-blue);
+}
+
+/* --- Schedule List --- */
+.schedule-row {
+    display: flex;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.3s;
+}
+.schedule-row:last-child { border-bottom: none; }
+.schedule-row:hover { background: rgba(255,255,255,0.03); }
+
+.sch-day {
+    width: 60px;
+    color: var(--neon-purple);
+    font-weight: bold;
+}
+.sch-time {
+    width: 70px;
+    color: #888;
+}
+.active-day {
+    background: linear-gradient(90deg, rgba(255, 42, 109, 0.1), transparent);
+    border-left: 3px solid var(--neon-pink);
+}
+
+/* --- Footer --- */
 footer {
     text-align: center;
     padding: 40px;
-    font-size: 0.8rem;
     opacity: 0.6;
-    border-top: 1px solid #333;
-    margin-top: 40px;
+    font-size: 0.8rem;
+    border-top: 1px solid #222;
+    margin-top: 80px;
+}
+
+/* --- Utility Classes --- */
+.text-green { color: var(--neon-green); }
+.text-pink { color: var(--neon-pink); }
+.text-blue { color: var(--neon-blue); }
+
+/* --- Boot Screen --- */
+#boot-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--neon-green);
+}
+.progress-bar {
+    width: 300px;
+    height: 2px;
+    background: #222;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.progress-fill {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    background: var(--neon-green);
+    width: 0%;
+    animation: load 2s ease-out forwards;
+    box-shadow: 0 0 10px var(--neon-green);
+}
+@keyframes load { 0% { width: 0; } 100% { width: 100%; } }
+
+/* --- Custom Cursor --- */
+#cursor-main {
+    position: fixed;
+    top: 0; left: 0;
+    width: 6px; height: 6px;
+    background: var(--neon-green);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10001;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--neon-green);
+}
+#cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 40px; height: 40px;
+    border: 1px solid var(--neon-pink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: width 0.15s, height 0.15s;
+    opacity: 0.8;
+}
+body.hovering #cursor-ring {
+    width: 50px; height: 50px;
+    border-color: var(--neon-green);
+    background: rgba(0, 255, 65, 0.1);
+}
+
+/* --- Project List Clean Up --- */
+.project-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+.project-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+.project-item:hover {
+    border-color: var(--neon-blue);
+    transform: translateY(-3px);
+}
+
+/* --- Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-window {
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh; /* changed from height to max-height for better fit */
+    background: rgba(10, 10, 16, 0.95);
+    border: 1px solid var(--neon-green);
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-window {
+    transform: scale(1);
+}
+
+.modal-header {
+    background: rgba(0, 255, 65, 0.1);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--neon-green);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    color: var(--neon-green);
+    font-family: 'Share Tech Mono';
+    font-size: 1.2rem;
+}
+
+.close-btn {
+    background: transparent;
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono';
+}
+
+.close-btn:hover {
+    background: var(--neon-green);
+    color: #000;
+}
+
+.modal-content {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+    color: #ddd;
 }
