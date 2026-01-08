@@ -19,6 +19,7 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://eimu-hoshii.github.io/favicon.ico">
     <link rel="apple-touch-icon" href="https://eimu-hoshii.github.io/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
 
     <!-- OGP (Open Graph Protocol) for SNS -->
     <meta property="og:title" content="HOSHII EIMU | OFFICIAL COMMAND CENTER">
@@ -55,12 +56,9 @@
 
     <!-- 起動画面 -->
     <div id="boot-screen">
-        <div class="loader-text">
-            SYSTEM BOOT...<br>
-            > CHECKING BIOS... OK<br>
-            > CONNECTING NEURAL NETWORK... OK<br>
-            > LOADING HOSHII_EIMU_OS v4.0...
-        </div>
+        <h2 class="mono-font"
+            style="color: var(--neon-green); margin-bottom: 10px; text-shadow: 0 0 10px var(--neon-green);">SYSTEM
+            BOOTING...</h2>
         <div class="progress-bar">
             <div class="progress-fill"></div>
         </div>
@@ -328,200 +326,7 @@
 
     <script src="schedule.js"></script>
 
-    <script>
-        // 起動画面の処理
-        window.addEventListener('load', () => {
-            const bootScreen = document.getElementById('boot-screen');
-            setTimeout(() => {
-                bootScreen.style.opacity = '0';
-                setTimeout(() => {
-                    bootScreen.style.display = 'none';
-                }, 500);
-            }, 2200);
-
-            if (typeof weeklySchedule !== 'undefined') {
-                renderSchedule();
-            } else {
-                document.getElementById('schedule-list').innerHTML = '<div style="color:red">> ERROR: schedule.js NOT FOUND</div>';
-            }
-        });
-
-        // カスタムカーソル処理
-        const cursorMain = document.getElementById('cursor-main');
-        const cursorRing = document.getElementById('cursor-ring');
-
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-        if (!isTouchDevice) {
-            window.addEventListener('mousemove', (e) => {
-                cursorMain.style.left = e.clientX + 'px';
-                cursorMain.style.top = e.clientY + 'px';
-
-                setTimeout(() => {
-                    cursorRing.style.left = e.clientX + 'px';
-                    cursorRing.style.top = e.clientY + 'px';
-                }, 50);
-            });
-
-            const interactables = document.querySelectorAll('a, button, .link-btn, .close-btn, .nav-item, #audio-toggle');
-            interactables.forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    document.body.classList.add('hovering');
-                    playHoverSound();
-                });
-                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-                el.addEventListener('click', playClickSound);
-            });
-        }
-
-        // --- Sound System (SFX) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let isSoundEnabled = false;
-
-        function toggleSound() {
-            isSoundEnabled = !isSoundEnabled;
-            const btn = document.getElementById('audio-toggle');
-            btn.innerText = isSoundEnabled ? "[AUDIO: ON]" : "[AUDIO: OFF]";
-            btn.style.color = isSoundEnabled ? "var(--neon-green)" : "#555";
-
-            if (isSoundEnabled) playClickSound();
-        }
-
-        function playHoverSound() {
-            if (!isSoundEnabled) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
-
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
-        }
-
-        function playClickSound() {
-            if (!isSoundEnabled) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        }
-
-        // スケジュール描画関数
-        function renderSchedule() {
-            const container = document.getElementById('schedule-list');
-            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-            const today = days[new Date().getDay()];
-            const rows = document.querySelectorAll('.schedule-row');
-
-            let html = '';
-            weeklySchedule.forEach(item => {
-                const isActive = item.day === today ? 'active-day' : '';
-                const activeBadge = item.day === today ? '<span class="active-badge">◀ ACTIVE</span>' : '';
-
-                html += `
-                    <div class="schedule-row ${isActive}">
-                        <div class="sch-day">${item.day}</div>
-                        <div class="sch-time">${item.time}</div>
-                        <div class="sch-content">${item.content}${activeBadge}</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // リアルタイム時計の処理
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, '0');
-
-            document.getElementById('clock-display').innerText = `${hours}:${minutes}:${seconds}:${ms}`;
-        }
-        setInterval(updateClock, 30);
-        updateClock();
-
-        // モーダル制御
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-        }
-
-        // URLコピー機能
-        function copyPageUrl() {
-            const url = "https://eimu-hoshii.github.io/";
-            const btn = document.getElementById('copy-btn');
-
-            const tempInput = document.createElement("input");
-            tempInput.style.position = "absolute";
-            tempInput.style.left = "-9999px";
-            tempInput.value = url;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-
-            btn.innerText = "[ COPIED! ]";
-            btn.style.borderColor = "var(--neon-green)";
-            btn.style.color = "var(--neon-green)";
-            btn.style.boxShadow = "0 0 10px var(--neon-green)";
-
-            if (typeof playClickSound === 'function' && isSoundEnabled) {
-                playClickSound();
-            }
-
-            setTimeout(() => {
-                btn.innerText = "[ COPY URL ]";
-                btn.style.borderColor = "var(--neon-purple)";
-                btn.style.color = "#fff";
-                btn.style.boxShadow = "none";
-            }, 2000);
-        }
-
-        window.onclick = function (event) {
-            if (event.target.classList.contains('modal-overlay')) {
-                event.target.classList.remove('active');
-                setTimeout(() => {
-                    event.target.style.display = 'none';
-                }, 300);
-            }
-        }
-    </script>
+    <script src="main.js"></script>
 </body>
 
 </html>

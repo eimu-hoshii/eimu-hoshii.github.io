@@ -1,0 +1,21 @@
+{
+    "name": "HOSHII EIMU COMMAND CENTER",
+    "short_name": "EIMU TERMINAL",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#030305",
+    "theme_color": "#030305",
+    "description": "星井詠夢 公式サイト / 作戦司令室",
+    "icons": [
+      {
+        "src": "favicon.ico",
+        "sizes": "64x64 32x32 24x24 16x16",
+        "type": "image/x-icon"
+      },
+      {
+        "src": "apple-touch-icon.png",
+        "sizes": "180x180",
+        "type": "image/png"
+      }
+    ]
+  }
