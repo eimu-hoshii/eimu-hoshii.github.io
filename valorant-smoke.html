@@ -1,44 +1,89 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- iOS PWA設定 -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- iOS PWA Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SMOKE GUIDE">
 
     <title>VALORANT SMOKE GUIDE</title>
+
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        val: {
+                            red: '#ff4655',
+                            dark: '#0f1923',
+                            slate: '#ece8e1',
+                            gray: '#8b9bb4'
+                        }
+                    },
+                    fontFamily: {
+                        teko: ['Teko', 'sans-serif'],
+                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        .touch-action-none { touch-action: none; }
-        
-        /* アプリ全体のコンテナ（画面いっぱいに固定） */
+        .touch-action-none {
+            touch-action: none;
+        }
+
+        body {
+            background-color: #0f1923;
+            /* VALORANT Dark */
+            color: #ece8e1;
+        }
+
+        /* App Container */
         .app-container {
             height: 100vh;
-            height: 100dvh; /* モバイルブラウザのアドレスバー対策 */
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(255, 70, 85, 0.05) 0%, transparent 50%),
+                linear-gradient(to bottom, #0f1923, #080d12);
         }
 
-        /* マップ表示エリア */
+        /* Map Viewport */
         .map-viewport {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #0f172a;
             position: relative;
             cursor: grab;
             display: flex;
             align-items: center;
             justify-content: center;
+            /* Grid Pattern Background */
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
-        .map-viewport:active { cursor: grabbing; }
 
-        /* 画像変形レイヤー */
+        .map-viewport:active {
+            cursor: grabbing;
+        }
+
+        /* Transform Layer for Zoom/Pan */
         #mapTransformLayer {
             width: 100%;
             height: 100%;
@@ -47,119 +92,185 @@
             justify-content: center;
             will-change: transform;
             transform-origin: center center;
-            padding: 10px;
         }
 
-        /* マップ画像 */
+        /* Map Image Wrapper for Rotation */
+        #mapRotationWrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Actual Image */
         #mapImage {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 95vw;
+            max-height: 80vh;
             width: auto;
             height: auto;
             object-fit: contain;
             pointer-events: none;
             display: block;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
         }
 
-        .pt-safe { padding-top: env(safe-area-inset-top); }
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        /* Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.15;
+        }
+
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1923;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ff4655;
+            border-radius: 3px;
+        }
+
+        /* Utility: Clip Path for cool edges */
+        .clip-val-btn {
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-white font-sans overflow-hidden select-none">
+
+<body class="font-sans overflow-hidden select-none">
+
+    <div class="scanlines"></div>
 
     <div class="app-container">
 
-        <!-- ========================================== -->
-        <!-- 1. ヘッダーエリア (マップ選択のみ) -->
-        <!-- ========================================== -->
-        <header class="flex-none bg-slate-800/95 backdrop-blur-md border-b border-slate-700 px-4 pt-safe pb-2 z-30 shadow-md">
-            <div class="h-[50px] flex items-center justify-between gap-3 mt-1">
-                <!-- ロゴ -->
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <div class="bg-red-500/10 p-1.5 rounded-lg border border-red-500/20">
-                        <i data-lucide="map" class="w-5 h-5 text-red-500"></i>
+        <!-- Header -->
+        <header class="flex-none bg-val-dark/90 backdrop-blur-md border-b border-val-red/30 z-30 pt-safe relative">
+            <div
+                class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-val-red to-transparent opacity-50">
+            </div>
+
+            <div class="h-[60px] flex items-center justify-between px-4">
+                <!-- Logo Area -->
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-val-red flex items-center justify-center rounded-sm">
+                        <i data-lucide="crosshair" class="text-white w-5 h-5"></i>
                     </div>
-                    <h1 class="font-bold text-lg tracking-wider hidden sm:block bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">SMOKE GUIDE</h1>
+                    <div>
+                        <h1 class="font-teko font-bold text-2xl tracking-widest leading-none text-white">SMOKE GUIDE
+                        </h1>
+                        <p class="text-[10px] tracking-[0.2em] text-val-gray uppercase font-bold">Tactical Reference</p>
+                    </div>
                 </div>
 
-                <!-- マップ選択 (スマホ用プルダウン) -->
-                <div class="flex-1 md:hidden">
-                    <div class="relative w-full">
-                        <select id="mobileMapSelect" class="w-full bg-slate-900 text-white font-bold border border-slate-600 rounded-lg py-2 pl-3 pr-10 appearance-none focus:outline-none focus:border-red-500 transition-colors shadow-inner text-sm truncate">
-                            <!-- JSで生成 -->
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
-                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                        </div>
+                <!-- Mobile Map Select -->
+                <div class="md:hidden relative w-40">
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-val-red">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </div>
+                    <select id="mobileMapSelect"
+                        class="w-full bg-val-dark/50 border border-val-gray/30 text-white font-teko text-lg tracking-wide rounded-sm py-1 pl-3 pr-8 appearance-none focus:outline-none focus:border-val-red transition-colors uppercase">
+                        <!-- JS generated -->
+                    </select>
                 </div>
             </div>
         </header>
 
-        <!-- ========================================== -->
-        <!-- 2. メインエリア (画像 + ズームボタン) -->
-        <!-- ========================================== -->
+        <!-- Main Content -->
         <div class="flex flex-1 overflow-hidden relative">
-            
-            <!-- PC用 サイドバー (幅広画面のみ表示) -->
-            <aside class="hidden md:flex flex-col w-64 bg-slate-800/95 backdrop-blur border-r border-slate-700 z-20 shadow-xl h-full">
-                <div class="p-4 border-b border-slate-700">
-                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <i data-lucide="crosshair" class="w-3 h-3"></i> Select Map
+
+            <!-- Sidebar (Desktop) -->
+            <aside class="hidden md:flex flex-col w-72 bg-val-dark/95 border-r border-val-gray/20 z-20 h-full relative">
+                <div class="p-5 border-b border-val-gray/10">
+                    <h2 class="font-teko text-xl text-val-red uppercase tracking-widest flex items-center gap-2">
+                        <i data-lucide="map" class="w-4 h-4"></i> Operation Map
                     </h2>
                 </div>
-                <div class="flex-1 overflow-y-auto p-2 pb-20">
-                    <div id="pcMapList" class="space-y-1">
-                        <!-- JSで生成 -->
-                    </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-2" id="pcMapList">
+                    <!-- JS generated -->
                 </div>
             </aside>
-            
-            <!-- マップ表示部 -->
-            <main class="flex-1 flex flex-col relative w-full h-full bg-slate-900">
-                
+
+            <!-- Viewport -->
+            <main class="flex-1 flex flex-col relative w-full h-full bg-[#0f1923]">
+
                 <div id="viewport" class="map-viewport touch-action-none">
                     <div id="mapTransformLayer">
-                        <img id="mapImage" src="" alt="Map Setup" class="shadow-2xl transition-opacity duration-300 opacity-0">
+                        <div id="mapRotationWrapper">
+                            <img id="mapImage" src="" alt="Map Setup" class="transition-opacity duration-300 opacity-0">
+                        </div>
                     </div>
-                    
-                    <!-- ロード中 -->
-                    <div id="loading" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-10 pointer-events-none">
-                        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-500 mb-3"></div>
-                        <span class="text-xs text-slate-400 font-mono animate-pulse">LOADING...</span>
+
+                    <!-- Loading Indicator -->
+                    <div id="loading"
+                        class="absolute inset-0 flex flex-col items-center justify-center bg-val-dark/80 backdrop-blur-sm z-10 pointer-events-none transition-opacity duration-300">
+                        <div
+                            class="w-12 h-12 border-4 border-val-red/30 border-t-val-red rounded-full animate-spin mb-4">
+                        </div>
+                        <span class="font-teko text-xl tracking-widest text-white animate-pulse">ESTABLISHING
+                            LINK...</span>
                     </div>
                 </div>
 
-                <!-- ズームボタン (フローティング: フッターの上に配置) -->
-                <!-- bottom-24 に変更して、固定フッターと重ならないように調整 -->
-                <div class="absolute bottom-24 right-4 flex flex-col gap-2 pointer-events-auto z-40">
-                    <button onclick="handleZoomIn()" class="w-10 h-10 bg-slate-800/80 backdrop-blur border border-slate-600 rounded-lg flex items-center justify-center text-white shadow-lg active:bg-slate-700 active:scale-95 transition-all">
-                        <i data-lucide="plus" class="w-5 h-5"></i>
+                <!-- Zoom Controls -->
+                <div class="absolute bottom-28 right-6 flex flex-col gap-3 pointer-events-auto z-40">
+                    <button onclick="handleZoomIn()"
+                        class="w-12 h-12 bg-val-dark/90 backdrop-blur border border-val-gray/50 hover:border-val-red text-white flex items-center justify-center shadow-lg active:scale-95 transition-all group rounded-sm">
+                        <i data-lucide="plus" class="w-6 h-6 group-hover:text-val-red transition-colors"></i>
                     </button>
-                    <button onclick="handleZoomOut()" class="w-10 h-10 bg-slate-800/80 backdrop-blur border border-slate-600 rounded-lg flex items-center justify-center text-white shadow-lg active:bg-slate-700 active:scale-95 transition-all">
-                        <i data-lucide="minus" class="w-5 h-5"></i>
+                    <button onclick="handleZoomOut()"
+                        class="w-12 h-12 bg-val-dark/90 backdrop-blur border border-val-gray/50 hover:border-val-red text-white flex items-center justify-center shadow-lg active:scale-95 transition-all group rounded-sm">
+                        <i data-lucide="minus" class="w-6 h-6 group-hover:text-val-red transition-colors"></i>
                     </button>
-                    <button onclick="resetView()" class="w-10 h-10 bg-slate-800/80 backdrop-blur border border-slate-600 rounded-lg flex items-center justify-center text-white shadow-lg active:bg-slate-700 active:scale-95 transition-all">
-                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    <button onclick="resetView()"
+                        class="w-12 h-12 bg-val-dark/90 backdrop-blur border border-val-gray/50 hover:border-val-red text-white flex items-center justify-center shadow-lg active:scale-95 transition-all group rounded-sm mt-2">
+                        <i data-lucide="rotate-ccw" class="w-5 h-5 group-hover:text-val-red transition-colors"></i>
                     </button>
                 </div>
 
             </main>
         </div>
 
-        <!-- ========================================== -->
-        <!-- 3. フッターエリア (攻守切り替えスイッチ) -->
-        <!-- ========================================== -->
-        <!-- fixed bottom-0 を追加して、画面最下部に強制固定 -->
-        <footer class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-4 py-3 pb-safe z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
-            <div class="w-full max-w-md mx-auto">
-                <div class="bg-slate-900 p-1 rounded-lg border border-slate-600 shadow-inner flex relative h-12">
-                    <div id="switchBg" class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-red-500 rounded-md transition-all duration-300 ease-out shadow-md left-1"></div>
-                    
-                    <button onclick="setSide('ATTACK')" id="btnAttack" class="relative flex-1 rounded-md text-sm font-bold flex items-center justify-center gap-2 z-10 transition-colors text-white active:scale-95">
+        <!-- Footer / Switch -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-val-dark/95 border-t border-val-red/30 pb-safe pt-2 z-50">
+            <div class="max-w-xl mx-auto px-4 pb-2">
+                <div class="flex items-center justify-between gap-1 mb-1">
+                    <span class="text-[10px] text-val-gray font-bold tracking-widest uppercase">Select Side</span>
+                    <span class="text-[10px] text-val-red font-bold tracking-widest uppercase"
+                        id="rotationIndicator">Normal View</span>
+                </div>
+
+                <div class="bg-black/40 p-1 rounded-sm border border-val-gray/20 flex relative h-14 clip-val-btn">
+                    <!-- Sliding Background -->
+                    <div id="switchBg"
+                        class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-val-red rounded-sm transition-all duration-300 left-1 shadow-[0_0_15px_rgba(255,70,85,0.4)]">
+                    </div>
+
+                    <button onclick="setSide('ATTACK')" id="btnAttack"
+                        class="relative flex-1 rounded-sm text-lg font-teko tracking-wider flex items-center justify-center gap-2 z-10 transition-colors text-white">
                         <i data-lucide="sword" class="w-4 h-4"></i> ATTACK
                     </button>
-                    <button onclick="setSide('DEFENSE')" id="btnDefense" class="relative flex-1 rounded-md text-sm font-bold flex items-center justify-center gap-2 z-10 transition-colors text-slate-400 active:scale-95">
+                    <button onclick="setSide('DEFENSE')" id="btnDefense"
+                        class="relative flex-1 rounded-sm text-lg font-teko tracking-wider flex items-center justify-center gap-2 z-10 transition-colors text-val-gray">
                         <i data-lucide="shield" class="w-4 h-4"></i> DEFENSE
                     </button>
                 </div>
@@ -170,38 +281,42 @@
 
     <script>
         const MAP_DATA = {
-            Ascent: { id: "ascent", name: "アセント", attackUrl: "https://i.imgur.com/F7iGqwg.png", defenseUrl: "https://i.imgur.com/fUmWl7X.png" },
-            Bind: { id: "bind", name: "バインド", attackUrl: "https://i.imgur.com/rhA4cTV.png", defenseUrl: "https://i.imgur.com/ymzMmix.png" },
-            Haven: { id: "haven", name: "ヘイヴン", attackUrl: "https://i.imgur.com/prhVQyX.png", defenseUrl: "https://i.imgur.com/kMZ8Lw8.png" },
-            Split: { id: "split", name: "スプリット", attackUrl: "https://i.imgur.com/tXtzM92.png", defenseUrl: "https://i.imgur.com/05kssln.png" },
-            Lotus: { id: "lotus", name: "ロータス", attackUrl: "https://i.imgur.com/qTmCQnn.png", defenseUrl: "https://i.imgur.com/Ip4KFDJ.png" },
-            Sunset: { id: "sunset", name: "サンセット", attackUrl: "https://i.imgur.com/WwTsgbw.png", defenseUrl: "https://i.imgur.com/SUeEWrh.png" },
-            Pearl: { id: "pearl", name: "パール", attackUrl: "https://i.imgur.com/3B9STc7.png", defenseUrl: "https://i.imgur.com/J61iybE.png" },
-            Fracture: { id: "fracture", name: "フラクチャー", attackUrl: "https://i.imgur.com/yVcX6R8.png", defenseUrl: "https://i.imgur.com/XikMFT9.png" },
-            Breeze: { id: "breeze", name: "ブリーズ", attackUrl: "https://i.imgur.com/B5zbMRA.png", defenseUrl: "https://i.imgur.com/EkF2goF.png" },
-            Icebox: { id: "icebox", name: "アイスボックス", attackUrl: "https://i.imgur.com/tLamk9u.png", defenseUrl: "https://i.imgur.com/OuOk6zK.png" },
-            Abyss: { id: "abyss", name: "アビス", attackUrl: "https://i.imgur.com/Hb9DnB7.png", defenseUrl: "https://i.imgur.com/xEHdUeF.png" }
+            Ascent: { id: "ascent", name: "ASCENT", attackUrl: "https://i.imgur.com/F7iGqwg.png", defenseUrl: "https://i.imgur.com/fUmWl7X.png" },
+            Bind: { id: "bind", name: "BIND", attackUrl: "https://i.imgur.com/rhA4cTV.png", defenseUrl: "https://i.imgur.com/ymzMmix.png" },
+            Haven: { id: "haven", name: "HAVEN", attackUrl: "https://i.imgur.com/prhVQyX.png", defenseUrl: "https://i.imgur.com/kMZ8Lw8.png" },
+            Split: { id: "split", name: "SPLIT", attackUrl: "https://i.imgur.com/tXtzM92.png", defenseUrl: "https://i.imgur.com/05kssln.png" },
+            Lotus: { id: "lotus", name: "LOTUS", attackUrl: "https://i.imgur.com/qTmCQnn.png", defenseUrl: "https://i.imgur.com/Ip4KFDJ.png" },
+            Sunset: { id: "sunset", name: "SUNSET", attackUrl: "https://i.imgur.com/WwTsgbw.png", defenseUrl: "https://i.imgur.com/SUeEWrh.png" },
+            Pearl: { id: "pearl", name: "PEARL", attackUrl: "https://i.imgur.com/3B9STc7.png", defenseUrl: "https://i.imgur.com/J61iybE.png" },
+            Fracture: { id: "fracture", name: "FRACTURE", attackUrl: "https://i.imgur.com/yVcX6R8.png", defenseUrl: "https://i.imgur.com/XikMFT9.png" },
+            Breeze: { id: "breeze", name: "BREEZE", attackUrl: "https://i.imgur.com/B5zbMRA.png", defenseUrl: "https://i.imgur.com/EkF2goF.png" },
+            Icebox: { id: "icebox", name: "ICEBOX", attackUrl: "https://i.imgur.com/tLamk9u.png", defenseUrl: "https://i.imgur.com/OuOk6zK.png" },
+            Abyss: { id: "abyss", name: "ABYSS", attackUrl: "https://i.imgur.com/Hb9DnB7.png", defenseUrl: "https://i.imgur.com/xEHdUeF.png" }
         };
 
-        const sortedMapKeys = Object.keys(MAP_DATA).sort((a, b) => MAP_DATA[a].name.localeCompare(MAP_DATA[b].name, 'ja'));
+        const sortedMapKeys = Object.keys(MAP_DATA).sort();
+
+        // State
         let currentMap = sortedMapKeys[0];
         let currentSide = 'ATTACK';
-        
         let scale = 1, pX = 0, pY = 0;
         let isDragging = false, startX, startY;
-        const MIN_SCALE = 1, MAX_SCALE = 4;
+        const MIN_SCALE = 1, MAX_SCALE = 5;
         let initialPinchDistance = 0, initialScale = 1, lastTapTime = 0;
 
-        const elements = {
+        // Elements
+        const el = {
             pcMapList: document.getElementById('pcMapList'),
             mobileMapSelect: document.getElementById('mobileMapSelect'),
             mapImage: document.getElementById('mapImage'),
+            rotationWrapper: document.getElementById('mapRotationWrapper'),
             layer: document.getElementById('mapTransformLayer'),
             viewport: document.getElementById('viewport'),
             btnAttack: document.getElementById('btnAttack'),
             btnDefense: document.getElementById('btnDefense'),
             switchBg: document.getElementById('switchBg'),
-            loading: document.getElementById('loading')
+            loading: document.getElementById('loading'),
+            rotIndicator: document.getElementById('rotationIndicator')
         };
 
         function init() {
@@ -210,91 +325,132 @@
             setupInteractions();
             lucide.createIcons();
 
-            elements.mobileMapSelect.addEventListener('change', (e) => {
+            el.mobileMapSelect.addEventListener('change', (e) => {
                 currentMap = e.target.value;
                 updateDisplay();
+                // Sync PC list highlight
                 renderMapSelectors();
             });
         }
 
         function renderMapSelectors() {
-            // PC
-            elements.pcMapList.innerHTML = '';
+            // PC Sidebar
+            el.pcMapList.innerHTML = '';
             sortedMapKeys.forEach(key => {
                 const map = MAP_DATA[key];
                 const isActive = key === currentMap;
+
                 const btn = document.createElement('button');
-                btn.className = `w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-between mb-1 ${
-                    isActive ? 'bg-red-500/10 text-red-400 border-l-2 border-red-500' : 'text-slate-400 hover:bg-slate-700'
-                }`;
-                btn.innerHTML = `<span>${map.name}</span>${isActive ? '<i data-lucide="chevron-right" class="w-4 h-4"></i>' : ''}`;
+                btn.className = `w-full text-left px-4 py-3 border-l-4 transition-all flex items-center justify-between group relative overflow-hidden ${isActive
+                        ? 'border-val-red bg-gradient-to-r from-val-red/20 to-transparent text-white'
+                        : 'border-transparent text-val-gray hover:text-white hover:bg-white/5'
+                    }`;
+
+                btn.innerHTML = `
+                    <span class="font-teko text-lg tracking-widest relative z-10">${map.name}</span>
+                    ${isActive ? '<i data-lucide="chevron-right" class="w-4 h-4 text-val-red"></i>' : ''}
+                `;
                 btn.onclick = () => { currentMap = key; updateDisplay(); renderMapSelectors(); };
-                elements.pcMapList.appendChild(btn);
+                el.pcMapList.appendChild(btn);
             });
             lucide.createIcons();
 
-            // Mobile
-            elements.mobileMapSelect.innerHTML = '';
+            // Mobile Select
+            el.mobileMapSelect.innerHTML = '';
             sortedMapKeys.forEach(key => {
                 const map = MAP_DATA[key];
                 const option = document.createElement('option');
                 option.value = key;
                 option.textContent = map.name;
                 if (key === currentMap) option.selected = true;
-                elements.mobileMapSelect.appendChild(option);
+                el.mobileMapSelect.appendChild(option);
             });
         }
 
         function updateDisplay() {
             const map = MAP_DATA[currentMap];
             const url = currentSide === 'ATTACK' ? map.attackUrl : map.defenseUrl;
+            const isAttack = currentSide === 'ATTACK';
 
-            if (currentSide === 'ATTACK') {
-                elements.switchBg.style.transform = 'translateX(0)';
-                elements.switchBg.className = "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-red-500 rounded-md transition-all duration-300 ease-out shadow-md left-1";
-                elements.btnAttack.classList.replace('text-slate-400', 'text-white');
-                elements.btnDefense.classList.replace('text-white', 'text-slate-400');
+            // Switch UI
+            if (isAttack) {
+                el.switchBg.style.transform = 'translateX(0)';
+                el.switchBg.className = "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-val-red rounded-sm transition-all duration-300 left-1 shadow-[0_0_15px_rgba(255,70,85,0.4)]";
+                el.btnAttack.classList.replace('text-val-gray', 'text-white');
+                el.btnDefense.classList.replace('text-white', 'text-val-gray');
+                el.rotIndicator.textContent = "ATTACKER SIDE (NORMAL)";
+
+                // Reset Rotation
+                el.rotationWrapper.style.transform = 'rotate(0deg)';
+
             } else {
-                elements.switchBg.style.transform = 'translateX(100%) translateX(8px)';
-                elements.switchBg.className = "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-teal-600 rounded-md transition-all duration-300 ease-out shadow-md left-0";
-                elements.btnAttack.classList.replace('text-white', 'text-slate-400');
-                elements.btnDefense.classList.replace('text-slate-400', 'text-white');
+                el.switchBg.style.transform = 'translateX(100%) translateX(8px)';
+                el.switchBg.className = "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-[#12c2a2] rounded-sm transition-all duration-300 left-0 shadow-[0_0_15px_rgba(18,194,162,0.4)]";
+                el.btnAttack.classList.replace('text-white', 'text-val-gray');
+                el.btnDefense.classList.replace('text-val-gray', 'text-white');
+                el.rotIndicator.textContent = "DEFENDER SIDE (ROTATED 180°)";
+
+                // Apply Rotation (180deg)
+                el.rotationWrapper.style.transform = 'rotate(180deg)';
             }
 
-            elements.loading.style.display = 'flex';
-            elements.mapImage.style.opacity = '0';
-            resetView();
+            // Image Load Logic
+            el.loading.style.opacity = '1';
+            el.mapImage.style.opacity = '0';
+
+            // Note: We do NOT reset View (zoom/pan) on side switch to allow comparison,
+            // but if map changes we might want to reset. 
+            // Current strict requirement: "Map flip".
+            // Let's reset view only if map changed in the same call? 
+            // For now, let's NOT reset view on side switch, only on map switch.
+            // But checking previous map is hard without extra state. 
+            // Let's just allow user to reset manually if needed, or if map loads.
 
             const img = new Image();
             img.onload = () => {
-                elements.mapImage.src = url;
-                elements.loading.style.display = 'none';
-                elements.mapImage.style.opacity = '1';
+                el.mapImage.src = url;
+                el.loading.style.opacity = '0';
+                el.mapImage.style.opacity = '1';
+                // Reset view on new image load to avoid lost context? 
+                // Let's keep it sticky if possible, but for map change we must reset.
+                // Simpler: Just Reset view every time image changes.
+                // resetView(); 
             };
             img.onerror = () => {
-                elements.loading.style.display = 'none';
-                elements.mapImage.src = "https://placehold.co/800x600/1e293b/94a3b8?text=No+Image";
-                elements.mapImage.style.opacity = '1';
+                el.loading.style.opacity = '0';
+                // Fallback or error state
+                console.error("Failed to load map image");
             };
             img.src = url;
         }
 
-        window.setSide = (side) => { if (currentSide !== side) { currentSide = side; updateDisplay(); } };
+        window.setSide = (side) => {
+            if (currentSide !== side) {
+                currentSide = side;
+                updateDisplay();
+            }
+        };
 
+        // Zoom & Pan System
         function applyTransform() {
-            elements.layer.style.transform = `translate(${pX}px, ${pY}px) scale(${scale})`;
+            // Apply scale and translate to the layer
+            // Note: Since rotation is inside the layer (in rotationWrapper), 
+            // panning logic (X/Y) stays consistent relative to screen, which is what we want!
+            el.layer.style.transform = `translate(${pX}px, ${pY}px) scale(${scale})`;
         }
+
         window.handleZoomIn = () => { scale = Math.min(scale + 0.5, MAX_SCALE); applyTransform(); };
-        window.handleZoomOut = () => { 
-            scale = Math.max(scale - 0.5, MIN_SCALE); 
-            if (scale === MIN_SCALE) { pX=0; pY=0; }
-            applyTransform(); 
+        window.handleZoomOut = () => {
+            scale = Math.max(scale - 0.5, MIN_SCALE);
+            if (scale === MIN_SCALE) { pX = 0; pY = 0; }
+            applyTransform();
         };
         window.resetView = () => { scale = 1; pX = 0; pY = 0; applyTransform(); };
 
         function setupInteractions() {
-            const vp = elements.viewport;
-            
+            const vp = el.viewport;
+
+            // Mouse Drag
             vp.addEventListener('mousedown', e => {
                 if (scale === 1) return;
                 isDragging = true;
@@ -309,19 +465,24 @@
                 pY = e.clientY - startY;
                 requestAnimationFrame(applyTransform);
             });
-            window.addEventListener('mouseup', () => { isDragging = false; vp.style.cursor = scale > 1 ? 'grab' : 'default'; });
-            
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                vp.style.cursor = scale > 1 ? 'grab' : 'default';
+            });
+
+            // Wheel Zoom
             vp.addEventListener('wheel', e => {
                 e.preventDefault();
                 const delta = -Math.sign(e.deltaY) * 0.2;
                 const newScale = Math.min(Math.max(scale + delta, MIN_SCALE), MAX_SCALE);
                 if (newScale !== scale) {
                     scale = newScale;
-                    if(scale === MIN_SCALE) { pX=0; pY=0; }
+                    if (scale === MIN_SCALE) { pX = 0; pY = 0; }
                     applyTransform();
                 }
             }, { passive: false });
 
+            // Touch
             vp.addEventListener('touchstart', e => {
                 if (e.touches.length === 2) {
                     isDragging = false;
@@ -332,7 +493,8 @@
                     startX = e.touches[0].clientX - pX;
                     startY = e.touches[0].clientY - pY;
                 }
-                
+
+                // Double tap reset
                 if (e.touches.length === 1) {
                     const now = new Date().getTime();
                     if (now - lastTapTime < 300) resetView();
@@ -365,4 +527,5 @@
         init();
     </script>
 </body>
+
 </html>
